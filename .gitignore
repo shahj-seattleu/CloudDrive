@@ -65,4 +65,5 @@ ehthumbs.db
 
 # Node Files #
 /cloudDrive-nodejs/node_modules/
+/angular-team/node_modules/
 **/*npm-debug.log.*
