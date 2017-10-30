@@ -1,0 +1,24 @@
+<header class="page-header">
+<h1><%= title %></h1>
+<h4><%= description %></h4>
+
+
+<% if (typeof hideAddDirectory === 'undefined') { %>
+<!-- <a class="btn btn-primary" href='/directory/add'>Upload a File/Folder</a> -->
+<% } %>
+
+<% if (typeof breadcrumbs !== 'undefined' && breadcrumbs) { %>
+<ol class="breadcrumb">
+    <%
+    for (var crumb of breadcrumbs) {
+        if (crumb.active) {
+        %><li class="active"><%= crumb.text %></li><%
+        } else {
+        %><li><a href="<%= crumb.href %>"><%= crumb.text %></a></li><%
+        }
+    }
+    %>
+</ol>
+<% } %>
+
+</header>

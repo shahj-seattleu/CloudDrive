@@ -5,7 +5,7 @@
  */
 
 var app = require('../app');
-var debug = require('debug')('clouddrive-nodejs:server');
+var debug = require('debug')('nodejs-team:server');
 var http = require('http');
 
 /**

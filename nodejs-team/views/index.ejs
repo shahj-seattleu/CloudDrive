@@ -1,11 +1,31 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-  </body>
+<head>
+<% include headerStuff %>
+</head>
+<body>
+<div class="container-fluid">
+<% include pageHeader %>
+
+<form id="frmUploader" enctype="multipart/form-data" action="files/add/" method="post">
+        <input type="file" name="imgUploader" multiple />
+        <input type="submit" name="submit" id="btnSubmit" value="Upload" />
+    </form>
+
+<% if (directorylist.length > 0) { %>
+
+<div class="row"><div class="col-xs-12">
+<div class="btn-group-vertical" role="group" style="width: 100%;"><%
+for (var directory of directorylist) {
+  %>
+      <%= directory.name %>
+  </a><%
+}
+%></div>
+<% } %>
+</div></div>
+
+<% include footer %>
+</div>
+</body>
 </html>

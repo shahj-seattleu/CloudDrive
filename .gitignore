@@ -65,5 +65,6 @@ ehthumbs.db
 
 # Node Files #
 /nodejs-team/node_modules/
+/nodejs-team/bower_modules/
 /angular-team/node_modules/
 **/*npm-debug.log.*
