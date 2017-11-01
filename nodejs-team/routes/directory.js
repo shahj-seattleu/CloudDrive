@@ -12,29 +12,29 @@ const error = require('debug')('nodejs-team:error');
 const fs = require("fs");
 
 
+
 // Add Directory(File or Folder). (create)
+
 router.post('/add', function(req, res, next) {
   console.log(`req: ${req.body}`);
-  var filePath = path.join(__dirname,"drive",'Icon.png');
+  var filePath = path.join(__dirname,'../drive','');
   console.log(`filePath: ${filePath}`);
-  fs.stat(filePath,(err,fileInfo) => {
-    if (err){
-      next(err);
-      return;
-    }
-    if(fileInfo.isFile()){
-      console.log(`Is file: ${fileInfo.isFile()}`);
-      res.sendFile(filePath);
-    }else if(fileInfo.isDirectory()){
-      console.log(`Is directory: ${fileInfo.isDirectory()}`);
+  fs.readdir(filePath, function(err, items) {
+       if(err)
+         next(err);
+      for (var i=0; i<items.length; i++) {
+          var file = filePath + '/' + items[i];
+          console.log("Start: " + file);
+          fs.stat(file, function(err, stats) {
+              console.log(stats);
+              console.log(stats["size"]);
+          });
+      }
       res.send('respond with a resource');
-    }else{
-      next();
-    }
 
   });
-});
 
+});
 
 
 module.exports = router;
