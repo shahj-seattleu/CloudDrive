@@ -4,7 +4,7 @@ var util = require('util');
 var path = require('path');
 var express = require('express');
 var router = express.Router();
-var directories = require('../models/Directory-fs');
+var directories = require('../sequelize-models/Directory-fs');
 
 const log   = require('debug')('nodejs-team:router-home');
 const error = require('debug')('nodejs-team:error');
