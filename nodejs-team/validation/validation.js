@@ -1,20 +1,20 @@
+var isValid = require('is-valid-path');
+const fs = require("fs");
+var bytes = require('bytes');
+var fileExtension = require('file-extension');
+
+
 
 function validation(filepath) {
   this.filepath = filepath;
 }
 
 
-
-//Check if the path is valid
-//npm i is-valid-path --save
 var isValidFilePath = function (filepath) {
-  var isValid = require('is-valid-path');
   return isValid(filepath);
 };
 
-//needs $ npm install --save path-exists
 var ispathExist = function(filepath) {
-    var fs = require('fs');
     if(fs.lstatSync(filePath).isDirectory()) {
       if (fs.existsSync(filePath)) {
         console.log('Found folder');
@@ -34,10 +34,7 @@ var ispathExist = function(filepath) {
 }
 
 //Check if the size of the file is less than 2MB
-//npm install filesize
 var isCheckSize = function (filepath) {
-    const fs = require("fs");
-    var bytes = require('bytes');
     const stats = fs.statSync(filepath);
     const fileSizeInBytes = stats.size;
     var mb_size = bytes(fileSizeInBytes, {unit:'MB', unitSeparator: ' '})
@@ -53,9 +50,7 @@ var isCheckSize = function (filepath) {
 
 //check if the extension exists
 //.zip, .doc, .pdf, .txt, no extension,
-//npm install --save file-extension
 function checkExtension(filepath) {
-  var fileExtension = require('file-extension');
   var extension  =  fileExtension(filepath);
   if(!extension.includes(".")){
     return true;
