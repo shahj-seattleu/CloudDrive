@@ -1,3 +1,10 @@
+
+function validation(filepath) {
+  this.filepath = filepath;
+}
+
+
+
 //Check if the path is valid
 //npm i is-valid-path --save
 var isValidFilePath = function (filepath) {
@@ -45,19 +52,30 @@ var isCheckSize = function (filepath) {
 }
 
 //check if the extension exists
+//.zip, .doc, .pdf, .txt, no extension,
+//npm install --save file-extension
+function checkExtension(filepath) {
+  var fileExtension = require('file-extension');
+  var extension  =  fileExtension(filepath);
+  if(!extension.includes(".")){
+    return true;
+  }else if(extension ==  ".zip" || extension == ".doc" || extension ==".pdf" || extension ==".txt"){
+    return true;
+  } else {
+    return false;
 
-
-
+  }
+}
 
 //Main Validation method
+function check_validation() {
+  filePath ="/Users/arti.seshadri/Documents/CloudDrive/nodejs-team/drive";
+  var result = isValidFilePath (this.filepath);
+  var result1 = ispathExist(this.filepath);
+  var result2 = isCheckSize(this.filepath);
+  var result3 = checkExtension(this.filepath);
 
-function validation(filePath) {
-  filePath ="/Users/arti.seshadri/Desktop/ML";
-  var result = isValidFilePath (filePath);
-  var result1 = ispathExist(filePath);
-  var result2 = isCheckSize(filePath);
-
-  if(result && result1 && result2){
+  if(result && result1 && result2 && result3){
       console.log("true");
       return Promise.resolve(true);
   }else {
