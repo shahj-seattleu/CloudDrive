@@ -18,11 +18,11 @@ exports.create = function(name, path, type, size) {
       path: path,
       type: type,
       size: size
-    }).then(function(user) {
-      if (user)
-        resolve(user.id);
+    }).then(function(drive) {
+      if (drive)
+        resolve(drive);
       else {
-        reject(`Error while creating a file`);
+        reject(`Error while creating a Drive model`);
       }
     });
   });
