@@ -1,11 +1,13 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   var Drive = sequelize.define('Drive', {
-    parent_id: DataTypes.INTEGER,
-    name: DataTypes.STRING,
-    path: DataTypes.STRING,
+    parent_id: { type: DataTypes.INTEGER,defaultValue: 0 },
+    name: { type: DataTypes.STRING, allowNull: false },
+    path: { type: DataTypes.STRING, unique: true , allowNull: false },
     fileType: DataTypes.INTEGER,
-    size: DataTypes.DOUBLE
+    size: { type: DataTypes.DOUBLE, validate: {
+      max: 200000.0  } //2MB
+   },
   }, {
     classMethods: {
       associate: function(models) {
