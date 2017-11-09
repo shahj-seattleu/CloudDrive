@@ -1,10 +1,4 @@
 
-function validation(filepath) {
-  this.filepath = filepath;
-}
-
-
-
 //Check if the path is valid
 //npm i is-valid-path --save
 var isValidFilePath = function (filepath) {
@@ -12,22 +6,22 @@ var isValidFilePath = function (filepath) {
   return isValid(filepath);
 };
 
-var isDirectory = function(filePath) {
+exports.isDirectory = function(filePath) {
     var fs = require('fs');
     return fs.lstatSync(filePath).isDirectory();
 }
 //needs $ npm install --save path-exists
 var ispathExist = function(filepath) {
     var fs = require('fs');
-    if(fs.lstatSync(filePath).isDirectory()) {
-      if (fs.existsSync(filePath)) {
+    if(fs.lstatSync(filepath).isDirectory()) {
+      if (fs.existsSync(filepath)) {
         console.log('Found folder');
          return true;
        } else {
         return false;
       }
     } else {
-       if (fs.existsSync(filePath)) {
+       if (fs.existsSync(filepath)) {
          console.log('Found file');
          return true;
        } else {
@@ -37,7 +31,7 @@ var ispathExist = function(filepath) {
 
 }
 
-var getSize = function (filepath) {
+exports.getSize = function (filepath) {
 
   const fs = require("fs");
   var bytes = require('bytes');
@@ -82,11 +76,12 @@ function checkExtension(filepath) {
 }
 
 //Main Validation method
-function check_validation() {
-  var result = isValidFilePath (this.filepath);
-  var result1 = ispathExist(this.filepath);
-  var result2 = isCheckSize(this.filepath);
-  var result3 = checkExtension(this.filepath);
+exports.check_validation = function(filepath) {
+  //var filepath ="/Users/arti.seshadri/Desktop/textnotes.rtf";
+  var result = isValidFilePath(filepath);
+  var result1 = ispathExist(filepath);
+  var result2 = isCheckSize(filepath);
+  var result3 = checkExtension(filepath);
 
   if(result && result1 && result2 && result3){
       console.log("true");
@@ -97,4 +92,5 @@ function check_validation() {
 
 
   }
+
 }

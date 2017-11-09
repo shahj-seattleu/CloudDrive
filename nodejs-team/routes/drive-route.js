@@ -1,5 +1,4 @@
 'use strict';
-
 var util = require('util');
 var path = require('path');
 var express = require('express');
@@ -11,23 +10,29 @@ const fs = require("fs");
 var validate = require("../validation/validation");
 
 
-router.get('/List', function(req, res, next) {
+router.get('/list', function(req, res, next) {
+  console.log("here");
     var filePath = path.join(__dirname, '../drive', '');
+    var result = validate.check_validation(filePath);
+    if(result) {
     var isRoot = false;
     fs.readdir(filePath, function(err, id) {
       if (err)
         next(err);
-      if(id ==0 ) {
+      if(id == 0 ) {
         isRoot = true;
       }
-      var p = files.getInfo(id, isRoot);
+      var p = files.list(id, isRoot);
       p.then(fileId => {
-        res.send(`respond with a resource id = ${fileId}`);
+        res.json(JSON.stringify(p));
         })
         .catch(err => {
           next(err);
         });
     });
+} else {
+    res.send(`Can't list.Faced Issue while Execution`);
+}
 
   });
 
@@ -51,29 +56,35 @@ router.post('/add', function (req, res, next) {
 
 router.post('/delete', function(req, res, next) {
       var filePath = path.join(__dirname, '../drive', '');
+      var result = validate.check_validation(filePath);
+      if(result) {
       fs.readdir(filePath, function(err, id) {
       if (err)
         next(err);
-      var p =files.deletePath(id);
+      var p =files.delete(id);
       p.then(fileId => {
-            res.send(`Deleted with a resource id = ${fileId}`);
+              res.json(JSON.stringify(p));
       })
       .catch(err => {
          next(err);
       });
 
   });
+}
+else {
+      res.send(`Can't Delete.Faced Issue while Execution`);
+}
 });
 
 
 
 // Add Directory(File or Folder). (create)
-
 router.post('/add', function(req, res, next) {
   console.log(`req: ${req.body}`);
   var filePath = path.join(__dirname, '../drive', '');
   console.log(`filePath: ${filePath}`);
-  while(items.length >0){
+ /*fs.readdir(filePath, function(err, items) {
+  while(items.length >0){*/
     fs.readdir(filePath, function(err, items) {
       if (err)
         next(err);
@@ -96,17 +107,13 @@ router.post('/add', function(req, res, next) {
             // read error
             console.log("Read error");
           }
-
-        });
-      }
-
-
-    });
-
-  }
-
+});
+}
+});
 
 });
+
+
 
 
 module.exports = router;
