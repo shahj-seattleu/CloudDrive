@@ -83,9 +83,9 @@ router.post('/add', function(req, res, next) {
   console.log(`req: ${req.body}`);
   var filePath = path.join(__dirname, '../drive', '');
   console.log(`filePath: ${filePath}`);
- /*fs.readdir(filePath, function(err, items) {
-  while(items.length >0){*/
     fs.readdir(filePath, function(err, items) {
+      var total_items = items;
+      // while(total_items.length > 0){
       if (err)
         next(err);
       for (var i = 0; i < items.length; i++) {
@@ -96,8 +96,8 @@ router.post('/add', function(req, res, next) {
             console.log(stats);
             console.log(stats["size"]);
             var p = files.create(file,file,1,stats["size"]);
-            p.then(fileId => {
-              res.send(`respond with a resource id = ${fileId}`);
+            p.then(drive => {
+              res.send(`respond with a resource id = ${drive.id}`);
               })
               .catch(err => {
                 next(err);
@@ -111,7 +111,13 @@ router.post('/add', function(req, res, next) {
 }
 });
 
-});
+        });
+      // }
+    }
+
+    });
+
+
 
 
 
