@@ -5,9 +5,7 @@ module.exports = (sequelize, DataTypes) => {
     name: { type: DataTypes.STRING, allowNull: false },
     path: { type: DataTypes.STRING, unique: true , allowNull: false },
     fileType: DataTypes.INTEGER,
-    size: { type: DataTypes.DOUBLE, validate: {
-      max: 200000.0  } //2MB
-   },
+    size: { type: DataTypes.DOUBLE, validate: {max: 200000.0 } },
   }, {
     classMethods: {
       associate: function(models) {

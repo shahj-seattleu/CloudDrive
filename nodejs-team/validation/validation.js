@@ -1,37 +1,36 @@
-
 //Check if the path is valid
 //npm i is-valid-path --save
-var isValidFilePath = function (filepath) {
+var isValidFilePath = function(filepath) {
   var isValid = require('is-valid-path');
   return isValid(filepath);
 };
 
 exports.isDirectory = function(filePath) {
-    var fs = require('fs');
-    return fs.lstatSync(filePath).isDirectory();
+  var fs = require('fs');
+  return fs.lstatSync(filePath).isDirectory();
 }
 //needs $ npm install --save path-exists
 var ispathExist = function(filepath) {
-    var fs = require('fs');
-    if(fs.lstatSync(filepath).isDirectory()) {
-      if (fs.existsSync(filepath)) {
-        console.log('Found folder');
-         return true;
-       } else {
-        return false;
-      }
+  var fs = require('fs');
+  if (fs.lstatSync(filepath).isDirectory()) {
+    if (fs.existsSync(filepath)) {
+      console.log('Found folder');
+      return true;
     } else {
-       if (fs.existsSync(filepath)) {
-         console.log('Found file');
-         return true;
-       } else {
-        return false;
-       }
-     }
+      return false;
+    }
+  } else {
+    if (fs.existsSync(filepath)) {
+      console.log('Found file');
+      return true;
+    } else {
+      return false;
+    }
+  }
 
 }
 
-exports.getSize = function (filepath) {
+exports.getSize = function(filepath) {
 
   const fs = require("fs");
   var bytes = require('bytes');
@@ -43,19 +42,21 @@ exports.getSize = function (filepath) {
 
 //Check if the size of the file is less than 2MB
 //npm install filesize
-var isCheckSize = function (filepath) {
-    const fs = require("fs");
-    var bytes = require('bytes');
-    const stats = fs.statSync(filepath);
-    const fileSizeInBytes = stats.size;
-    var mb_size = bytes(fileSizeInBytes, {unit:'MB', unitSeparator: ' '})
-    var res = mb_size.split(" ");
-    if (parseFloat(res[0])< 2){
-      return true;
-    }
-    else {
-      return false;
-    }
+var isCheckSize = function(filepath) {
+  const fs = require("fs");
+  var bytes = require('bytes');
+  const stats = fs.statSync(filepath);
+  const fileSizeInBytes = stats.size;
+  var mb_size = bytes(fileSizeInBytes, {
+    unit: 'MB',
+    unitSeparator: ' '
+  })
+  var res = mb_size.split(" ");
+  if (parseFloat(res[0]) < 2) {
+    return true;
+  } else {
+    return false;
+  }
 
 }
 
@@ -64,10 +65,10 @@ var isCheckSize = function (filepath) {
 //npm install --save file-extension
 function checkExtension(filepath) {
   var fileExtension = require('file-extension');
-  var extension  =  fileExtension(filepath);
-  if(!extension.includes(".")){
+  var extension = fileExtension(filepath);
+  if (!extension.includes(".")) {
     return true;
-  }else if(extension ==  ".zip" || extension == ".doc" || extension ==".pdf" || extension ==".txt"){
+  } else if (extension == ".zip" || extension == ".doc" || extension == ".pdf" || extension == ".txt") {
     return true;
   } else {
     return false;
@@ -83,12 +84,12 @@ exports.check_validation = function(filepath) {
   var result2 = isCheckSize(filepath);
   var result3 = checkExtension(filepath);
 
-  if(result && result1 && result2 && result3){
-      console.log("true");
-      return Promise.resolve(true);
-  }else {
-      console.log("false");
-      return Promise.resolve(true);
+  if (result && result1 && result2 && result3) {
+    console.log("true");
+    return Promise.resolve(true);
+  } else {
+    console.log("false");
+    return Promise.resolve(true);
 
 
   }

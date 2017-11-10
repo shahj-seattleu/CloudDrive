@@ -10,13 +10,13 @@ var models = require('../models/index');
 var Drive = require('../models/drive');
 
 
-exports.create = function(name, path, type, size) {
-  console.log("test");
+exports.create = function(id,name, path, type, size) {
   return new Promise((resolve, reject) => {
     models.Drive.create({
+      parent_id:id,
       name: name,
       path: path,
-      type: type,
+      fileType: type,
       size: size
     }).then(function(drive) {
       if (drive)
