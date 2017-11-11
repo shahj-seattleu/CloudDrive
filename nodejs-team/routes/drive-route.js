@@ -72,7 +72,14 @@ router.post('/add', function(req, res, next) {
     var data_promise = walkSync(src, dest, [], null);
     data_promise.then(data => {
         console.log(data);
-        res.send(data);
+        var parent = drive_sequelize.list(0);
+        parent.then(drives => {
+          res.json(JSON.stringify(drives));
+          })
+          .catch(err => {
+            reject(err);
+          });
+
       })
       .catch(err => {
         next(err);

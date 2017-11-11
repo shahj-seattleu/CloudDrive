@@ -27,3 +27,19 @@ exports.create = function(id,name, path, type, size) {
     });
   });
 };
+
+exports.list = function(parentId) {
+  return new Promise((resolve, reject) => {
+    models.Drive.find({
+      where: {
+         parent_id: parentId
+      }
+    }).then(function(drives) {
+      if (drives)
+        resolve(drives);
+      else {
+        reject(`Error while creating a Drive model`);
+      }
+    });
+  });
+};
