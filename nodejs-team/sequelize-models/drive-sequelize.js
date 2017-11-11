@@ -30,7 +30,7 @@ exports.create = function(id,name, path, type, size) {
 
 exports.list = function(parentId) {
   return new Promise((resolve, reject) => {
-    models.Drive.find({
+    models.Drive.findAll({
       where: {
          parent_id: parentId
       }
@@ -38,7 +38,23 @@ exports.list = function(parentId) {
       if (drives)
         resolve(drives);
       else {
-        reject(`Error while creating a Drive model`);
+        reject(`Error while listing all drives`);
+      }
+    });
+  });
+};
+
+exports.get_parent = function(id) {
+  return new Promise((resolve, reject) => {
+    models.Drive.find({
+      where: {
+         parent_id: id , fileType :1
+      }
+    }).then(function(drive) {
+      if (drive)
+        resolve(drive);
+      else {
+        reject(`Error while find a parent Drive model`);
       }
     });
   });

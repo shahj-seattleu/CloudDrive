@@ -61,29 +61,60 @@ router.post('/delete', function(req, res, next) {
 
 
 
-router.post('/add', function(req, res, next) {
+router.post('/add/:id', function(req, res, next) {
   var src = path.join(__dirname, '../drive', '');
+
+  // console.log(` Key : ${req.params.id}`);
+  var key = 0;
+  if (req.params.id!=undefined){
+    key = req.params.id;
+  }
+  // console.log(` Key query: ${key}`);
   // console.log(`src: ${src}`);
   let dest = path.join(__dirname, '../public/cloud/');
   fs.access(dest, (err) => {
     if (err)
       fs.mkdirSync(dest);
 
-    var data_promise = walkSync(src, dest, [], null);
-    data_promise.then(data => {
-        console.log(data);
-        var parent = drive_sequelize.list(0);
-        parent.then(drives => {
-          res.json(JSON.stringify(drives));
+      if (key != 0){
+        var root = drive_sequelize.get_parent(key);
+        root.then(p_drive => {
+              // console.log(`Drive : ${p_drive}`);
+              var data_promise = walkSync(src, dest, [], p_drive);
+              data_promise.then(data => {
+                  var parent = drive_sequelize.list(key);
+                  parent.then(drives => {
+                      res.send(JSON.stringify(drives));
+                    })
+                    .catch(err => {
+                      reject(err);
+                    });
+
+                })
+                .catch(err => {
+                  next(err);
+                });
           })
           .catch(err => {
             reject(err);
           });
+      }else{
+        var data_promise = walkSync(src, dest, [], null);
+        data_promise.then(data => {
+          console.log(`Key qu :${key}`);
+            var parent = drive_sequelize.list(key);
+            parent.then(drives => {
+                res.send(JSON.stringify(drives));
+              })
+              .catch(err => {
+                reject(err);
+              });
+          })
+          .catch(err => {
+            next(err);
+          });
+      }
 
-      })
-      .catch(err => {
-        next(err);
-      });
   });
 
 
