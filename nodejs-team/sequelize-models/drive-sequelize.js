@@ -120,3 +120,23 @@ exports.delete = function (id) {
   });
 });
 }
+
+exports.move = function (sourceId, destParentId) {
+    console.log(`sourceId:${sourceId}  parentId:${destParentId}`)
+    return new Promise((resolve, reject) => {
+        models.Drive.update({
+            parent_id: destParentId
+        }, {
+            where: {
+                id: sourceId
+            }
+        }).then(function (moved) {
+            console.log(`"moved" callback param value is: ${moved}`);
+            if (moved != 0)
+                resolve(`Moved id:${sourceId} to new parent:${destParentId}`);
+            else {
+                reject(`Failed to move id:${sourceId} to new parent:${destParentId}`);
+            }
+        });
+    });
+};

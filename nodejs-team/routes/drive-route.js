@@ -60,6 +60,29 @@ router.get('/delete', function(req, res, next) {
 });
 
 
+router.get('/move', function (req, res, next) {
+    console.log("move");
+    var filePath = path.join(__dirname, '../drive', '');
+    var result = validate.check_validation(filePath);
+    if (result) {
+        fs.readdir(filePath, function (err, id, pid) {
+            if (err)
+                next(err);
+            var p = drive_sequelize.move(id, pid);
+            p.then(fileId => {
+                res.json(JSON.stringify(p));
+            })
+                .catch(err => {
+                    next(err);
+                });
+        });
+    } else {
+        res.send(`Can't move. Faced Issue while Execution`);
+    }
+
+});
+
+
 router.post('/add/:id', function(req, res, next) {
   var src = path.join(__dirname, '../drive', '');
 
