@@ -15,7 +15,6 @@ router.get('/list', function(req, res, next) {
   var filePath = path.join(__dirname, '../drive', '');
   var result = validate.check_validation(filePath);
   if (result) {
-    var isRoot = false;
     fs.readdir(filePath, function(err, id) {
       if (err)
         next(err);
@@ -37,28 +36,27 @@ router.get('/list', function(req, res, next) {
 
 router.get('/delete', function(req, res, next) {
   console.log("delete");
-      var filePath = path.join(__dirname, '../drive', '');
-      var result = validate.check_validation(filePath);
-      if(result) {
-      fs.readdir(filePath, function(err, id) {
+  var filePath = path.join(__dirname, '../drive', '');
+  var result = validate.check_validation(filePath);
+  if (result) {
+     fs.readdir(filePath, function(err, id) {
       if (err)
-        next(err);
+          next(err);
       var isFile = validate.isDirectory(filePath);
       //Test this
       var p =files.multiple(id, isFile);
       p.then(drives => {
-        res.json(drives);
+          res.json(drives);
       })
       .catch(err => {
           res.send(`Can't Delete.No File Found`);
-         next(err);
+          next(err);
       });
-
-  });
-}
-else {
-      res.send(`Can't Delete.Faced Issue while Execution`);
-}
+     });
+  }
+  else {
+     res.send(`Can't Delete.Faced Issue while Execution`);
+  }
 });
 
 
