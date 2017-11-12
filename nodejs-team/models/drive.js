@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       associate: function(models) {
         // associations can be defined here
         Drive.hasMany(models.Drive);
-        Drive.belongsTo(models.Drive, { as: "parent_id" });
+        Drive.belongsTo(models.Drive, { as: "parent" });
 
       }
     }
