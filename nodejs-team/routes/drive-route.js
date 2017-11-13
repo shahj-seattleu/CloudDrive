@@ -59,8 +59,8 @@ router.get('/delete', function(req, res, next) {
 });
 
 
-router.get('/move', function (req, res, next) {
-    console.log(`router move`);
+router.get('/move', function(req, res, next) {
+    console.log("router move");
     var filePath = path.join(__dirname, '../drive', '');
     var result = validate.check_validation(filePath);
     if (result) {
@@ -70,7 +70,7 @@ router.get('/move', function (req, res, next) {
             
             //////////////////////////////////////////////////////////
             id = 3;                 // TODO: Remove this test data! //
-            destPath = "test path"; // TODO: Remove this test data! //
+            destPath = 'test path'; // TODO: Remove this test data! //
             //////////////////////////////////////////////////////////
 
             var p = drive_sequelize.move(id, destPath);
@@ -88,7 +88,7 @@ router.get('/move', function (req, res, next) {
 });
 
 
-router.post('/add/:id', function (req, res, next) {
+router.post('/add/:id', function(req, res, next) {
   var src = path.join(__dirname, '../drive', '');
 
   // console.log(` Key : ${req.params.id}`);
