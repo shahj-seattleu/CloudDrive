@@ -63,27 +63,37 @@ exports.get_parent = function(id) {
 
 
 exports.multiple  = function (id , isFile) {
-   console.log("delete multiple");
-   console.log("id"+id);
-    id = '8';
-    var x= getFile(id);
+    var p;
+    isFile =false;
     if(isFile) {
-    /*  return new Promise ((resolve, reject ) => {
-        models.Drive.destroy({ where: { id: id }}).then(function(drive)  {
-        if(drive == 0) {
-          reject(`Not Deleted Successfully`);
-        }
-        else  {
-          resolve("Deleted successfully");
-        }
-      });
-    });*/
+      return delete_file(id);
     } else {
-
-     p = getFile(id);
+    var x = getFilePath(id);
+    console.log('else');
+    const Op = sequelize.Op;
+     x.then(p_drive => {
+     models.Drive.findAll({
+          where: {
+               path: {
+                 [Op.like]: p_drive.dataValues.path +'%'
+            }
+          }
+        }).then(function(drive) {
+           Object.keys(drive).forEach(function(key) {
+             var val = drive[key];
+             p =delete_file(val.id);
+             console.log('sdddd'+p);
+          }).catch(err => {
+            reject(err);
+          });
+        });
+     }).catch(err => {
+       reject(err);
+     });
    }
 
-}
+   return x;
+};
 
 var getFile = function (id) {
   var array = [];
