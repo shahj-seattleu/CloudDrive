@@ -8,6 +8,7 @@ const error = require('debug')('nodejs-team:error');
 
 var models = require('../models/index');
 var Drive = require('../models/drive');
+var sequelize = require('sequelize');
 
 
 exports.create = function(id,name, path, type, size) {
@@ -64,7 +65,6 @@ exports.get_parent = function(id) {
 
 exports.multiple  = function (id , isFile) {
     var p;
-    isFile =false;
     if(isFile) {
       return delete_file(id);
     } else {
@@ -95,41 +95,32 @@ exports.multiple  = function (id , isFile) {
    return x;
 };
 
-var getFile = function (id) {
-  var array = [];
-  console.log("get folders");
-  console.log('id' +id);
-  var drive = -1;
-do{
-     return new Promise ((resolve, reject ) => {
-      models.Drive.findAll({ where: { parent_id: id }}).then(function(drive)  {
-      console.log(drive);
-      console.log('drivvvess' + drive.dataValues.id);
-      array.push(drive.id);
-      id = drive.id;
-      console.log('id' + id);
-    });
-      });
-  } while(drive !=0);
 
-}
-
-exports.delete = function (id) {
+var delete_file = function (id) {
   console.log("delete");
-  var id = '2';
   console.log('id'+id);
   return new Promise ((resolve, reject ) => {
-  models.Drive.destroy({ where: { id: id }}).then(function(drive)  {
-  console.log(drive);
-  if(drive == 0) {
-    reject (`Not Deleted Successfully`);
-  }
-  else  {
-    resolve(drive);
-  }
-  });
-});
-}
+          models.Drive.destroy({ where: { id: id }}).then(function(drive)  {
+          if(drive == 0) {
+            reject(`Not Deleted Successfully`);
+          }
+          else  {
+            resolve("Deleted successfully");
+          }
+        });
+      });
+
+};
+
+var getFilePath = function (id) {
+   console.log("getFilePath"+id);
+    return models.Drive.find({
+       where: {
+         id: id
+       }
+     })
+};
+
 
 exports.move = function (sourceId, destPath) {
     console.log(`sourceId:${sourceId}  destPath:${destPath}`)
