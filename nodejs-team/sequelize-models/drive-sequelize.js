@@ -123,20 +123,64 @@ exports.delete = function (id) {
 
 exports.move = function (sourceId, destParentId) {
     console.log(`sourceId:${sourceId}  parentId:${destParentId}`)
+
     return new Promise((resolve, reject) => {
-        models.Drive.update({
-            parent_id: destParentId
-        }, {
-            where: {
-                id: sourceId
+
+        var destRootPath = path.join(__dirname, '../public/cloud/');
+        var destFullPath;
+        var destFileName;
+
+        // Find the name of the file/folder that we're moving
+        models.Drive.findById(sourceId).then(function (sourceRow) {
+            if (sourceRow) {
+                destFileName = sourceRow.name;
             }
-        }).then(function (moved) {
-            console.log(`"moved" callback param value is: ${moved}`);
-            if (moved != 0)
-                resolve(`Moved id:${sourceId} to new parent:${destParentId}`);
             else {
-                reject(`Failed to move id:${sourceId} to new parent:${destParentId}`);
+                var msg = `Failed to find "name" data for sourceId:${sourceId}`;
+                console.log(msg);
+                reject(msg);
             }
+
+            // Find the path of the destination folder
+            models.Drive.findById(destParentId).then(function (destRow) {
+                if (destRow) {
+                    // Build the path from the parent row
+                    destFullPath = path.join(destRow.path, destFileName);
+                }
+                else if (destParentId == 0) {
+                    // Use the default root path
+                    destFullPath = path.join(destRootPath, destFileName)
+                }
+                else {
+                    var msg = `Failed to find "path" data for id (destParentId):${destParentId}`;
+                    console.log(msg);
+                    reject(msg);
+                }
+
+                console.log(`destParentId full path: '${destFullPath}'`);
+
+                // Update the database with the new path for the sourceId
+                models.Drive.update(
+                    {
+                        parent_id: destParentId,
+                        path: destPath
+                    },
+                    {
+                        where: { id: sourceId }
+                    }
+                ).then(function (moved) {
+                    if (moved != 0) {
+                        var msg = `Moved id:${sourceId} to new parent:${destParentId}`;
+                        console.log(msg);
+                        resolve(msg);
+                    }
+                    else {
+                        var msg = `Failed to move id:${sourceId} to new parent:${destParentId}`;
+                        console.log(msg);
+                        reject(msg);
+                    }
+                });
+            });
         });
     });
 };
