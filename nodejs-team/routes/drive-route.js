@@ -61,14 +61,16 @@ router.get('/delete', function(req, res, next) {
 
 
 router.get('/move', function (req, res, next) {
-    console.log("move");
+    console.log("router move");
     var filePath = path.join(__dirname, '../drive', '');
     var result = validate.check_validation(filePath);
     if (result) {
-        fs.readdir(filePath, function (err, id, pid) {
+        fs.readdir(filePath, function (err, id, path) {
             if (err)
                 next(err);
-            var p = drive_sequelize.move(id, pid);
+                id= 3;
+                path= 'test path';
+            var p = drive_sequelize.move(id, path);
             p.then(fileId => {
                 res.json(JSON.stringify(p));
             })

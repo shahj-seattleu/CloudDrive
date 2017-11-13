@@ -14,14 +14,14 @@ var ispathExist = function(filepath) {
   var fs = require('fs');
   if (fs.lstatSync(filepath).isDirectory()) {
     if (fs.existsSync(filepath)) {
-      console.log('Found folder');
+      console.log('Found folder ' + filepath);
       return true;
     } else {
       return false;
     }
   } else {
     if (fs.existsSync(filepath)) {
-      console.log('Found file');
+      console.log('Found file ' + filePath);
       return true;
     } else {
       return false;
@@ -85,10 +85,10 @@ exports.check_validation = function(filepath) {
   var result3 = checkExtension(filepath);
 
   if (result && result1 && result2 && result3) {
-    console.log("true");
+    console.log("all validations passed: true");
     return Promise.resolve(true);
   } else {
-    console.log("false");
+    console.log("all validations passed: false");
     return Promise.resolve(true);
 
 
