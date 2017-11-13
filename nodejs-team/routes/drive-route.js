@@ -33,7 +33,6 @@ router.get('/list', function(req, res, next) {
 });
 
 
-
 router.get('/delete', function(req, res, next) {
   console.log("delete");
   var filePath = path.join(__dirname, '../drive', '');
@@ -61,22 +60,26 @@ router.get('/delete', function(req, res, next) {
 
 
 router.get('/move', function (req, res, next) {
-    console.log("router move");
+    console.log(`router move`);
     var filePath = path.join(__dirname, '../drive', '');
     var result = validate.check_validation(filePath);
     if (result) {
-        fs.readdir(filePath, function (err, id, path) {
+        fs.readdir(filePath, function (err, id, destPath) {
             if (err)
                 next(err);
-                id= 3;
-                path= 'test path';
-            var p = drive_sequelize.move(id, path);
+            
+            //////////////////////////////////////////////////////////
+            id = 3;                 // TODO: Remove this test data! //
+            destPath = "test path"; // TODO: Remove this test data! //
+            //////////////////////////////////////////////////////////
+
+            var p = drive_sequelize.move(id, destPath);
             p.then(fileId => {
                 res.json(JSON.stringify(p));
             })
-                .catch(err => {
-                    next(err);
-                });
+            .catch(err => {
+                next(err);
+            });
         });
     } else {
         res.send(`Can't move. Faced Issue while Execution`);
@@ -85,11 +88,7 @@ router.get('/move', function (req, res, next) {
 });
 
 
-
-
-
-
-router.post('/add/:id', function(req, res, next) {
+router.post('/add/:id', function (req, res, next) {
   var src = path.join(__dirname, '../drive', '');
 
   // console.log(` Key : ${req.params.id}`);
@@ -260,5 +259,6 @@ function copyFile(src, dest) {
 
   readStream.pipe(fs.createWriteStream(dest));
 }
+
 
 module.exports = router;
