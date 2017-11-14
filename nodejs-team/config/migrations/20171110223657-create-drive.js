@@ -17,6 +17,9 @@ module.exports = {
       path: {
         type: Sequelize.STRING
       },
+      sha: {
+        type: Sequelize.STRING
+      },
       fileType: {
         type: Sequelize.INTEGER
       },

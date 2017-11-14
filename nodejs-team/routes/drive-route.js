@@ -8,6 +8,7 @@ const log = require('debug')('nodejs-team:router-dive');
 const error = require('debug')('nodejs-team:error');
 const fs = require("fs");
 var validate = require("../validation/validation");
+var sha = require("../sha/sha.js");
 
 
 router.get('/list', function(req, res, next) {
@@ -216,6 +217,13 @@ var walkSync = function(dir, dest, filelist, data) {
                   .catch(err => {
                     reject(err);
                   });
+                  console.log('Path before SHA'+destDir);
+                  var sha_encyp = sha.getHash_Checksum(destDir);
+                  sha_encyp.then(data => {
+                        drive_sequelize.update(data.id, sha_encyp);
+                    }).catch(err => {
+                      next(err);
+                    });
               });
 
             } else {
@@ -229,6 +237,13 @@ var walkSync = function(dir, dest, filelist, data) {
                   })
                   .catch(err => {
                     reject(err);
+                  });
+                  console.log('Path before SHA'+destDir);
+                  var sha_encyp = sha.getHash_Checksum(destDir);
+                  sha_encyp.then(data => {
+                        drive_sequelize.update(0, sha_encyp);
+                  }).catch(err => {
+                      next(err);
                   });
               });
 
