@@ -11,24 +11,21 @@ var validate = require("../validation/validation");
 
 
 router.get('/list', function(req, res, next) {
-  console.log("here");
-  var filePath = path.join(__dirname, '../drive', '');
-  var result = validate.check_validation(filePath);
-  if (result) {
-    fs.readdir(filePath, function(err, id) {
-      if (err)
-        next(err);
-      var p = drive_sequelize.list(id);
-      p.then(fileId => {
-          res.json(JSON.stringify(p));
-        })
-        .catch(err => {
-          next(err);
-        });
-    });
-  } else {
-    res.send(`Can't list.Faced Issue while Execution`);
+
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-  With, Content-Type, Accept");
+
+  var key = 0;
+  if (req.params.path_id != undefined) {
+    key = req.params.path_id;
   }
+  var p = drive_sequelize.list(key);
+  p.then(drives => {
+      res.json(JSON.stringify(drives));
+    })
+    .catch(err => {
+      next(err);
+    });
 
 });
 
@@ -98,6 +95,9 @@ router.post('/add', function(req, res, next) {
   var key = 0;
   if (req.body.path_id != undefined) {
     key = req.body.path_id;
+  }
+  if (req.body.file_path != undefined) {
+    src = req.body.file_path;
   }
   // console.log(` Key query: ${key}`);
   // console.log(`src: ${src}`);

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {DataService} from '../../services/data.service';
-
+// const parseJson = require('parse-json');
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -18,18 +18,24 @@ export class HomeComponent implements OnInit {
   ngOnInit() {
     console.log('ngOnInit ran successfuly ...');
     this.dataservice.getPosts().subscribe((posts) => {
-      //console.log(posts);
-      this.posts = posts;
+      // console.log(JSON.parse(posts));
+
+
+      this.posts = JSON.parse(posts);
     });
   }
 
 
-  
+
 };
 
 interface Post{
-  id: Number,
-  title: String,
-  body: String,
-  
+  id:Number,
+  parent_id: Number,
+  name: String,
+  path: String,
+  fileType:Number,
+  size:Number
+
+
 }
