@@ -99,7 +99,6 @@ router.post('/add', function(req, res, next) {
   if (req.body.file_path != undefined) {
     src = path.join(__dirname, req.body.file_path, '');
   }
-  // console.log(` Key query: ${key}`);
   console.log(`src: ${src}`);
   let dest = path.join(__dirname, '../public/cloud/');
   fs.access(dest, (err) => {
@@ -110,34 +109,23 @@ router.post('/add', function(req, res, next) {
       var root = drive_sequelize.get_parent(key);
       root.then(p_drive => {
           // console.log(`Drive : ${p_drive}`);
-          var data_promise = walkSync(src, dest, [], p_drive);
-          data_promise.then(data => {
-              var parent = drive_sequelize.list(key);
-              parent.then(drives => {
-                  res.status(200).send(JSON.stringify(drives));
-                })
-                .catch(err => {
-                  reject(err);
-                });
-
+          walkSync(src, dest, [], p_drive);
+          var parent = drive_sequelize.list(key);
+          parent.then(drives => {
+              res.status(200).send(JSON.stringify(drives));
             })
             .catch(err => {
               next(err);
             });
         })
         .catch(err => {
-          reject(err);
+          next(err);
         });
     } else {
-      var data_promise = walkSync(src, dest, [], null);
-      data_promise.then(data => {
-          var parent = drive_sequelize.list(key);
-          parent.then(drives => {
-              res.status(200).send(JSON.stringify(drives));
-            })
-            .catch(err => {
-              reject(err);
-            });
+      walkSync(src, dest, [], null);
+      var parent = drive_sequelize.list(key);
+      parent.then(drives => {
+          res.status(200).send(JSON.stringify(drives));
         })
         .catch(err => {
           next(err);
@@ -151,109 +139,106 @@ router.post('/add', function(req, res, next) {
 
 
 var walkSync = function(dir, dest, filelist, data) {
+  // console.log(`dest in the params : ${dest}`);
+  var files = fs.readdirSync(dir);
+  filelist = filelist || [];
+  // console.log(`All Files: ${files}`);
+  files.forEach(function(file) {
+    if (fs.statSync(path.join(dir, file)).isDirectory()) {
+      // console.log(`Directory: ${path.join(dir, file)}`);
+      var folder_name = path.basename(path.join(dir, file));
+      // console.log(`folder_name: ${folder_name}`);
+      if (data) {
+        let destDir = path.join(dest, file, '/');
+        // console.log(`Folder destDir ${destDir}`);
+        fs.access(destDir, (err) => {
+          if (err)
+            fs.mkdirSync(destDir);
+          var parent = drive_sequelize.create(data.id, folder_name, destDir, 1, 0);
+          parent.then(drive => {
+              filelist = walkSync(path.join(dir, file), destDir, filelist, drive);
+            })
+            .catch(err => {
+              return;
+            });
+        });
 
-  return new Promise((resolve, reject) => {
-    // console.log(`dest in the params : ${dest}`);
-    var files = fs.readdirSync(dir);
-    filelist = filelist || [];
-    // console.log(`All Files: ${files}`);
-    files.forEach(function(file) {
-      if (fs.statSync(path.join(dir, file)).isDirectory()) {
-        // console.log(`Directory: ${path.join(dir, file)}`);
-        var folder_name = path.basename(path.join(dir, file));
-        // console.log(`folder_name: ${folder_name}`);
-        if (data) {
-          let destDir = path.join(dest, file, '/');
-          // console.log(`Folder destDir ${destDir}`);
-          fs.access(destDir, (err) => {
-            if (err)
-              fs.mkdirSync(destDir);
-            var parent = drive_sequelize.create(data.id, folder_name, destDir, 1, 0);
-            parent.then(drive => {
-                filelist = walkSync(path.join(dir, file), destDir, filelist, drive);
-              })
-              .catch(err => {
-                reject(err);
-              });
-          });
-
-
-        } else {
-          let destDir = path.join(dest, file, '/');
-          // console.log(`Folder destDir Root${destDir}`);
-          fs.access(destDir, (err) => {
-            if (err)
-              fs.mkdirSync(destDir);
-            var parent = drive_sequelize.create(0, folder_name, destDir, 1, 0);
-            parent.then(drive => {
-                filelist = walkSync(path.join(dir, file), destDir, filelist, drive);
-              })
-              .catch(err => {
-                reject(err);
-              });
-          });
-
-
-        }
 
       } else {
-        // console.log(`File: ${file}`);
-        fs.stat(path.join(dir, file), function(err, stats) {
-          if (stats) {
-            // console.log(stats["size"]);
-            var file_path = path.basename(path.join(dir, file));
-            // console.log(`file_path: ${file_path}`);
-            if (data) {
-              let destDir = path.join(dest, file);
-              // console.log(`File destDir ${destDir}`);
-              fs.access(destDir, (err) => {
-                var child = drive_sequelize.create(data.id, file, destDir, 2, stats["size"]);
-                child.then(drive => {
-                    copyFile(path.join(dir, file), path.join(dest, file));
-                    filelist.push(file);
-                  })
-                  .catch(err => {
-                    reject(err);
-                  });
-                // var sha_encyp = sha.getHash_Checksum(destDir);
-                // sha_encyp.then(data => {
-                //   drive_sequelize.update(data.id, sha_encyp);
-                // }).catch(err => {
-                //   next(err);
-                // });
-              });
-
-            } else {
-              let destDir = path.join(dest, file);
-              // console.log(`File Root destDir ${destDir}`);
-              fs.access(destDir, (err) => {
-                var child = drive_sequelize.create(0, file, destDir, 2, stats["size"]);
-                child.then(drive => {
-                    copyFile(path.join(dir, file), path.join(dest, file));
-                    filelist.push(file);
-                  })
-                  .catch(err => {
-                    reject(err);
-                  });
-                // var sha_encyp = sha.getHash_Checksum(destDir);
-                // sha_encyp.then(data => {
-                //   drive_sequelize.update(0, sha_encyp);
-                // }).catch(err => {
-                //   next(err);
-                // });
-              });
-
-            }
-          } else {
-            console.log("Read error");
-            reject("Read error");
-          }
+        let destDir = path.join(dest, file, '/');
+        // console.log(`Folder destDir Root${destDir}`);
+        fs.access(destDir, (err) => {
+          if (err)
+            fs.mkdirSync(destDir);
+          var parent = drive_sequelize.create(0, folder_name, destDir, 1, 0);
+          parent.then(drive => {
+              filelist = walkSync(path.join(dir, file), destDir, filelist, drive);
+            })
+            .catch(err => {
+              return;
+            });
         });
+
+
       }
 
-    });
-    return resolve(filelist);
+    } else {
+      // console.log(`File: ${file}`);
+      fs.stat(path.join(dir, file), function(err, stats) {
+        if (stats) {
+          // console.log(stats["size"]);
+          var file_path = path.basename(path.join(dir, file));
+          // console.log(`file_path: ${file_path}`);
+          if (data) {
+            let destDir = path.join(dest, file);
+            // console.log(`File destDir ${destDir}`);
+            fs.access(destDir, (err) => {
+              var child = drive_sequelize.create(data.id, file, destDir, 2, stats["size"]);
+              child.then(drive => {
+                  copyFile(path.join(dir, file), path.join(dest, file));
+                  filelist.push(file);
+                })
+                .catch(err => {
+                  return;
+                });
+              // var sha_encyp = sha.getHash_Checksum(destDir);
+              // sha_encyp.then(data => {
+              //   drive_sequelize.update(data.id, sha_encyp);
+              // }).catch(err => {
+              //   next(err);
+              // });
+            });
+
+          } else {
+            let destDir = path.join(dest, file);
+            // console.log(`File Root destDir ${destDir}`);
+            fs.access(destDir, (err) => {
+              var child = drive_sequelize.create(0, file, destDir, 2, stats["size"]);
+              child.then(drive => {
+                  copyFile(path.join(dir, file), path.join(dest, file));
+                  filelist.push(file);
+                })
+                .catch(err => {
+                  return;
+                });
+              // var sha_encyp = sha.getHash_Checksum(destDir);
+              // sha_encyp.then(data => {
+              //   drive_sequelize.update(0, sha_encyp);
+              // }).catch(err => {
+              //   next(err);
+              // });
+            });
+
+          }
+        } else {
+          console.log("Read error");
+          return;
+        }
+      });
+    }
+
   });
+  return filelist;
 };
 
 
