@@ -17,14 +17,14 @@ module.exports = {
       path: {
         type: Sequelize.STRING
       },
-      sha: {
-        type: Sequelize.STRING
-      },
       fileType: {
         type: Sequelize.INTEGER
       },
       size: {
         type: Sequelize.DOUBLE
+      },
+      sha_256: {
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,

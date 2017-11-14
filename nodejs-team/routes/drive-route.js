@@ -8,7 +8,7 @@ const log = require('debug')('nodejs-team:router-dive');
 const error = require('debug')('nodejs-team:error');
 const fs = require("fs");
 var validate = require("../validation/validation");
-var sha = require("../sha/sha.js");
+var sha = require("../sha/sha");
 
 
 router.get('/list', function(req, res, next) {
@@ -41,7 +41,7 @@ router.post('/delete', function(req, res, next) {
       if (drive) {
         var isFile = validate.isDirectory(drive.path);
         var mul = drive_sequelize.multiple(key, isFile);
-      mul.then(drives => {
+        mul.then(drives => {
 
           })
           .catch(err => {
@@ -97,10 +97,10 @@ router.post('/add', function(req, res, next) {
     key = req.body.path_id;
   }
   if (req.body.file_path != undefined) {
-    src = req.body.file_path;
+    src = path.join(__dirname, req.body.file_path, '');
   }
   // console.log(` Key query: ${key}`);
-  // console.log(`src: ${src}`);
+  console.log(`src: ${src}`);
   let dest = path.join(__dirname, '../public/cloud/');
   fs.access(dest, (err) => {
     if (err)
@@ -131,7 +131,6 @@ router.post('/add', function(req, res, next) {
     } else {
       var data_promise = walkSync(src, dest, [], null);
       data_promise.then(data => {
-          console.log(`Key qu :${key}`);
           var parent = drive_sequelize.list(key);
           parent.then(drives => {
               res.status(200).send(JSON.stringify(drives));
@@ -216,13 +215,12 @@ var walkSync = function(dir, dest, filelist, data) {
                   .catch(err => {
                     reject(err);
                   });
-                console.log('Path before SHA' + destDir);
-                var sha_encyp = sha.getHash_Checksum(destDir);
-                sha_encyp.then(data => {
-                  drive_sequelize.update(data.id, sha_encyp);
-                }).catch(err => {
-                  next(err);
-                });
+                // var sha_encyp = sha.getHash_Checksum(destDir);
+                // sha_encyp.then(data => {
+                //   drive_sequelize.update(data.id, sha_encyp);
+                // }).catch(err => {
+                //   next(err);
+                // });
               });
 
             } else {
@@ -237,13 +235,12 @@ var walkSync = function(dir, dest, filelist, data) {
                   .catch(err => {
                     reject(err);
                   });
-                console.log('Path before SHA' + destDir);
-                var sha_encyp = sha.getHash_Checksum(destDir);
-                sha_encyp.then(data => {
-                  drive_sequelize.update(0, sha_encyp);
-                }).catch(err => {
-                  next(err);
-                });
+                // var sha_encyp = sha.getHash_Checksum(destDir);
+                // sha_encyp.then(data => {
+                //   drive_sequelize.update(0, sha_encyp);
+                // }).catch(err => {
+                //   next(err);
+                // });
               });
 
             }

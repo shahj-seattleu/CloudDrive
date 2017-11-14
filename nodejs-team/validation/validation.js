@@ -1,17 +1,18 @@
-//Check if the path is valid
-//npm i is-valid-path --save
+var isValid = require('is-valid-path');
+var fs = require('fs');
+var bytes = require('bytes');
+var fileExtension = require('file-extension');
+
+
 var isValidFilePath = function(filepath) {
-  var isValid = require('is-valid-path');
   return isValid(filepath);
 };
 
 exports.isDirectory = function(filePath) {
-  var fs = require('fs');
   return fs.lstatSync(filePath).isDirectory();
 }
 //needs $ npm install --save path-exists
 var ispathExist = function(filepath) {
-  var fs = require('fs');
   if (fs.lstatSync(filepath).isDirectory()) {
     if (fs.existsSync(filepath)) {
       console.log('Found folder');
@@ -32,8 +33,6 @@ var ispathExist = function(filepath) {
 
 exports.getSize = function(filepath) {
 
-  const fs = require("fs");
-  var bytes = require('bytes');
   const stats = fs.statSync(filepath);
   const fileSizeInBytes = stats.size;
   return fileSizeInBytes;
@@ -41,10 +40,7 @@ exports.getSize = function(filepath) {
 }
 
 //Check if the size of the file is less than 2MB
-//npm install filesize
 var isCheckSize = function(filepath) {
-  const fs = require("fs");
-  var bytes = require('bytes');
   const stats = fs.statSync(filepath);
   const fileSizeInBytes = stats.size;
   var mb_size = bytes(fileSizeInBytes, {
@@ -62,9 +58,7 @@ var isCheckSize = function(filepath) {
 
 //check if the extension exists
 //.zip, .doc, .pdf, .txt, no extension,
-//npm install --save file-extension
 function checkExtension(filepath) {
-  var fileExtension = require('file-extension');
   var extension = fileExtension(filepath);
   if (!extension.includes(".")) {
     return true;
@@ -78,7 +72,6 @@ function checkExtension(filepath) {
 
 //Main Validation method
 exports.check_validation = function(filepath) {
-  //var filepath ="/Users/arti.seshadri/Desktop/textnotes.rtf";
   var result = isValidFilePath(filepath);
   var result1 = ispathExist(filepath);
   var result2 = isCheckSize(filepath);

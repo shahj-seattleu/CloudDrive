@@ -11,10 +11,10 @@ var Drive = require('../models/drive');
 var sequelize = require('sequelize');
 
 
-exports.create = function(id,name, path, type, size) {
+exports.create = function(id, name, path, type, size) {
   return new Promise((resolve, reject) => {
     models.Drive.create({
-      parent_id:id,
+      parent_id: id,
       name: name,
       path: path,
       fileType: type,
@@ -34,7 +34,7 @@ exports.get_drive = function(id) {
   return new Promise((resolve, reject) => {
     models.Drive.find({
       where: {
-         id: id
+        id: id
       }
     }).then(function(drive) {
       if (drive)
@@ -47,7 +47,7 @@ exports.get_drive = function(id) {
 };
 
 
-exports.list = function (sourceId) {
+exports.list = function(sourceId) {
   console.log(`exports.list -- sourceId:${sourceId}`)
 
   return new Promise((resolve, reject) => {
@@ -55,16 +55,16 @@ exports.list = function (sourceId) {
     var isFile;
 
     // Find the name of the file/folder that we're moving
-    models.Drive.findById(sourceId).then(function (sourceRow) {
+    models.Drive.findById(sourceId).then(function(sourceRow) {
       if (sourceRow || sourceId == 0) {
         isFile = (sourceId == 0) ? 1 : sourceRow.fileType;
         if (isFile == 1) {
           // A folder list has been requested, so find everything that has this folder as a parent
           models.Drive.findAll({
             where: {
-                parent_id: sourceId
+              parent_id: sourceId
             }
-          }).then(function (drives) {
+          }).then(function(drives) {
             if (drives)
               resolve(drives);
             else {
@@ -74,16 +74,15 @@ exports.list = function (sourceId) {
             }
           });
         } else if (isFile == 2) {
-            // An individual file has been requested, so send back the data that we already have
-            resolve(sourceRow);
+          // An individual file has been requested, so send back the data that we already have
+          resolve(sourceRow);
         } else {
-            // Someone goofed somewhere and the database has an invalid fileType, so complain!
-            var msg = `Error: Unknown fileType detected:${isFile}`;
-            console.log(msg);
-            reject(msg);
+          // Someone goofed somewhere and the database has an invalid fileType, so complain!
+          var msg = `Error: Unknown fileType detected:${isFile}`;
+          console.log(msg);
+          reject(msg);
         }
-      }
-      else {
+      } else {
         var msg = `Failed to find "name" data for sourceId:${sourceId}`;
         console.log(msg);
         reject(msg);
@@ -97,7 +96,8 @@ exports.get_parent = function(id) {
   return new Promise((resolve, reject) => {
     models.Drive.find({
       where: {
-         parent_id: id , fileType :1
+        parent_id: id,
+        fileType: 1
       }
     }).then(function(drive) {
       if (drive)
@@ -112,7 +112,7 @@ exports.get_parent = function(id) {
 
 exports.multiple = function(id, isFile) {
   var p;
-  if(isFile) {
+  if (isFile) {
     return delete_file(id);
   } else {
     var x = getFilePath(id);
@@ -121,15 +121,15 @@ exports.multiple = function(id, isFile) {
     x.then(p_drive => {
       models.Drive.findAll({
         where: {
-            path: {
-              [Op.like]: p_drive.dataValues.path +'%'
-            }
+          path: {
+            [Op.like]: p_drive.dataValues.path + '%'
+          }
         }
       }).then(function(drive) {
         Object.keys(drive).forEach(function(key) {
           var val = drive[key];
           p = delete_file(val.id);
-          console.log('sdddd'+p);
+          console.log('sdddd' + p);
         }).catch(err => {
           reject(err);
         });
@@ -143,15 +143,18 @@ exports.multiple = function(id, isFile) {
 };
 
 
-var delete_file = function (id) {
+var delete_file = function(id) {
   console.log("delete");
-  console.log('id'+id);
-  return new Promise ((resolve, reject ) => {
-    models.Drive.destroy({ where: { id: id }}).then(function(drive)  {
+  console.log('id' + id);
+  return new Promise((resolve, reject) => {
+    models.Drive.destroy({
+      where: {
+        id: id
+      }
+    }).then(function(drive) {
       if (drive == 0) {
         reject(`Not Deleted Successfully`);
-      }
-      else  {
+      } else {
         resolve("Deleted successfully");
       }
     });
@@ -159,34 +162,38 @@ var delete_file = function (id) {
 };
 
 
-var getFilePath = function (id) {
-   console.log("getFilePath"+id);
-   return models.Drive.find({
-     where: {
-       id: id
-     }
-   })
+var getFilePath = function(id) {
+  console.log("getFilePath" + id);
+  return models.Drive.find({
+    where: {
+      id: id
+    }
+  })
 };
 
 
-exports.update = function (id , sha) {
+exports.update = function(id, sha) {
   console.log('In update sha');
-  return new Promise ((resolve, reject ) => {
-    models.Drive.update( { sha: sha },
-    { where: { id: id } }).then(function(drive)  {
-        console.log(drive);
-        if (drive == 0) {
-          reject("Failed to update SHA");
-        }
-        else  {
-          resolve("Updated successfully");
-        }
+  return new Promise((resolve, reject) => {
+    models.Drive.update({
+      sha_256: sha
+    }, {
+      where: {
+        id: id
+      }
+    }).then(function(drive) {
+      console.log(drive);
+      if (drive == 0) {
+        reject("Failed to update SHA");
+      } else {
+        resolve("Updated successfully");
+      }
     });
   });
 };
 
 
-exports.move = function (sourceId, destPath) {
+exports.move = function(sourceId, destPath) {
   console.log(`sourceId:${sourceId}  destPath:${destPath}`)
 
   return new Promise((resolve, reject) => {
@@ -197,78 +204,81 @@ exports.move = function (sourceId, destPath) {
     var isFile;
 
     // Find the name of the file/folder that we're moving
-    models.Drive.findById(sourceId).then(function (sourceRow) {
+    models.Drive.findById(sourceId).then(function(sourceRow) {
       if (sourceRow) {
-          destFileName = sourceRow.name;
-          isFile = sourceRow.fileType;
-      }
-      else {
-          var msg = `Failed to find "name" data for sourceId:${sourceId}`;
-          console.log(msg);
-          reject(msg);
+        destFileName = sourceRow.name;
+        isFile = sourceRow.fileType;
+      } else {
+        var msg = `Failed to find "name" data for sourceId:${sourceId}`;
+        console.log(msg);
+        reject(msg);
       }
 
       // Use the destination path provided in the function
       if (destPath) {
-          // Build the path from the filename and destination path
-          if(isFile == 1) {
-              destFullPath = path.join(destPath, destFileName,'\\');
-          }
-          else if(isFile == 2) {
-              destFullPath = path.join(destPath, destFileName);
-          }
-      }
-      else {
-          var msg = `Path not valid (destPath):${destPath}`;
-          console.log(msg);
-          reject(msg);
+        // Build the path from the filename and destination path
+        if (isFile == 1) {
+          destFullPath = path.join(destPath, destFileName, '\\');
+        } else if (isFile == 2) {
+          destFullPath = path.join(destPath, destFileName);
+        }
+      } else {
+        var msg = `Path not valid (destPath):${destPath}`;
+        console.log(msg);
+        reject(msg);
       }
 
       console.log(`destFullPath full path: '${destFullPath}'`);
 
       // Find new parent ID
       var destParentId;
-      models.Drive.find({where: {path: destPath }}).then(function (sourceRow) {
+      models.Drive.find({
+        where: {
+          path: destPath
+        }
+      }).then(function(sourceRow) {
         if (sourceRow) {
-            destParentId = sourceRow.id;
-        }
-        else if (destRootPath == destPath) {
-            destParentId = 0;
-        }
-        else {
-            var msg = `Failed to find "Id" data for destPath:${destPath}`;
-            console.log(msg);
-            reject(msg);
+          destParentId = sourceRow.id;
+        } else if (destRootPath == destPath) {
+          destParentId = 0;
+        } else {
+          var msg = `Failed to find "Id" data for destPath:${destPath}`;
+          console.log(msg);
+          reject(msg);
         }
 
         //Update the database with the new path for the sourceId
         models.Drive.update({
-              parent_id: destParentId,
-              path: destFullPath
-        },
-        {
-              where: { id: sourceId }
-        }).then(function (moved) {
-          if (moved != 0) {
-              var msg = `Moved id:${sourceId} to new parent:${destParentId}`;
-              console.log(msg);
-              resolve(msg);
+          parent_id: destParentId,
+          path: destFullPath
+        }, {
+          where: {
+            id: sourceId
           }
-          else {
-              var msg = `Failed to move id:${sourceId} to new parent:${destParentId}`;
-              console.log(msg);
-              reject(msg);
+        }).then(function(moved) {
+          if (moved != 0) {
+            var msg = `Moved id:${sourceId} to new parent:${destParentId}`;
+            console.log(msg);
+            resolve(msg);
+          } else {
+            var msg = `Failed to move id:${sourceId} to new parent:${destParentId}`;
+            console.log(msg);
+            reject(msg);
           }
         });
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// TODO: FIX THIS SINCE IT WILL LIKELY RUN **BEFORE** THE PREVIOUS CALL TO models.Drive.update() FINISHES ITS UPDATE  //
-// (SINCE IT IS NOT PART OF THE CALLBACK) -- OR IS THAT OK SINCE IT'S BASICALLY DELETING IN PARALLEL WITH THE UPDATE? //
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // TODO: FIX THIS SINCE IT WILL LIKELY RUN **BEFORE** THE PREVIOUS CALL TO models.Drive.update() FINISHES ITS UPDATE  //
+        // (SINCE IT IS NOT PART OF THE CALLBACK) -- OR IS THAT OK SINCE IT'S BASICALLY DELETING IN PARALLEL WITH THE UPDATE? //
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if (isFile == 1) {
           //to be tested with nested folders
-          models.Drive.find({ where: { parent_id: sourceId }}).then(function(drive)  {
-            exports.move(drive.id,path.join(destFullPath))
+          models.Drive.find({
+            where: {
+              parent_id: sourceId
+            }
+          }).then(function(drive) {
+            exports.move(drive.id, path.join(destFullPath))
           });
         }
       });

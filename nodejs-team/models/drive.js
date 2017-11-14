@@ -1,18 +1,16 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   var Drive = sequelize.define('Drive', {
-    parent_id: { type: DataTypes.INTEGER,defaultValue: 0 },
-    name: { type: DataTypes.STRING, allowNull: false },
-    path: { type: DataTypes.STRING, unique: true , allowNull: false },
+    parent_id: DataTypes.INTEGER,
+    name: DataTypes.STRING,
+    path: DataTypes.STRING,
     fileType: DataTypes.INTEGER,
-    size: { type: DataTypes.DOUBLE, validate: {max: 200000.0 } },
+    size: DataTypes.DOUBLE,
+    sha_256: DataTypes.STRING
   }, {
     classMethods: {
       associate: function(models) {
         // associations can be defined here
-        Drive.hasMany(models.Drive);
-        Drive.belongsTo(models.Drive, { as: "parent" });
-
       }
     }
   });
