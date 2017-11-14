@@ -29,6 +29,22 @@ exports.create = function(id,name, path, type, size) {
   });
 };
 
+exports.get_drive = function(id) {
+  return new Promise((resolve, reject) => {
+    models.Drive.find({
+      where: {
+         id: id
+      }
+    }).then(function(drive) {
+      if (drive)
+        resolve(drive);
+      else {
+        reject(`Error while get drive`);
+      }
+    });
+  });
+};
+
 exports.list = function(parentId) {
   return new Promise((resolve, reject) => {
     models.Drive.findAll({

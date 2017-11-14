@@ -12,10 +12,8 @@ var sha = require("../sha/sha.js");
 
 
 router.get('/list', function(req, res, next) {
-
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-  With, Content-Type, Accept");
-
   var key = 0;
   if (req.params.path_id != undefined) {
     key = req.params.path_id;
@@ -32,32 +30,33 @@ router.get('/list', function(req, res, next) {
 
 
 
-router.get('/delete', function(req, res, next) {
-  console.log("delete");
-  var filePath = path.join(__dirname, '../drive', '');
-  var result = validate.check_validation(filePath);
-  if (result) {
-    fs.readdir(filePath, function(err, id) {
-      if (err)
-        next(err);
-      var isFile = validate.isDirectory(filePath);
-      var p = drive_sequelize.multiple(id, isFile);
-      p.then(drives => {
-          if (drives == null) {
-            res.send(`Can't Delete.No File Found`);
-          } else {
-            res.json(drives);
-          }
-        })
-        .catch(err => {
-          res.send(`Can't Delete.No File Found`);
-          next(err);
-        });
+router.post('/delete', function(req, res, next) {
 
-    });
-  } else {
-    res.send(`Can't Delete.Faced Issue while Execution`);
+  var key = 0;
+  if (req.body.path_id != undefined) {
+    key = req.body.path_id;
   }
+  var p = drive_sequelize.get_drive(key);
+  p.then(drive => {
+      if (drive) {
+        var isFile = validate.isDirectory(drive.path);
+        var mul = drive_sequelize.multiple(key, isFile);
+      mul.then(drives => {
+
+          })
+          .catch(err => {
+            res.send(`Can't Delete.No File Found`);
+            // needs to give an error json
+            next(err);
+          });
+      }
+    })
+    .catch(err => {
+      res.send(`Can't Delete.No File Found`);
+      next(err);
+    });
+
+
 });
 
 
@@ -217,13 +216,13 @@ var walkSync = function(dir, dest, filelist, data) {
                   .catch(err => {
                     reject(err);
                   });
-                  console.log('Path before SHA'+destDir);
-                  var sha_encyp = sha.getHash_Checksum(destDir);
-                  sha_encyp.then(data => {
-                        drive_sequelize.update(data.id, sha_encyp);
-                    }).catch(err => {
-                      next(err);
-                    });
+                console.log('Path before SHA' + destDir);
+                var sha_encyp = sha.getHash_Checksum(destDir);
+                sha_encyp.then(data => {
+                  drive_sequelize.update(data.id, sha_encyp);
+                }).catch(err => {
+                  next(err);
+                });
               });
 
             } else {
@@ -238,13 +237,13 @@ var walkSync = function(dir, dest, filelist, data) {
                   .catch(err => {
                     reject(err);
                   });
-                  console.log('Path before SHA'+destDir);
-                  var sha_encyp = sha.getHash_Checksum(destDir);
-                  sha_encyp.then(data => {
-                        drive_sequelize.update(0, sha_encyp);
-                  }).catch(err => {
-                      next(err);
-                  });
+                console.log('Path before SHA' + destDir);
+                var sha_encyp = sha.getHash_Checksum(destDir);
+                sha_encyp.then(data => {
+                  drive_sequelize.update(0, sha_encyp);
+                }).catch(err => {
+                  next(err);
+                });
               });
 
             }
