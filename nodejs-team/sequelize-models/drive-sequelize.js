@@ -45,19 +45,51 @@ exports.get_drive = function(id) {
   });
 };
 
-exports.list = function(parentId) {
-  return new Promise((resolve, reject) => {
-    models.Drive.findAll({
-      where: {
-         parent_id: parentId
-      }
-    }).then(function(drives) {
-      if (drives)
-        resolve(drives);
-      else {
-        reject(`Error while listing all drives`);
-      }
-    });
+exports.list = function(sourceId) {
+    console.log(`exports.list -- sourceId:${sourceId}`)
+
+    return new Promise((resolve, reject) => {
+
+        var isFile;
+
+        // Find the name of the file/folder that we're moving
+        models.Drive.findById(sourceId).then(function (sourceRow) {
+            if (sourceRow) {
+                isFile = sourceRow.fileType;
+                if (isFile == 1) {
+                    // folder
+                    models.Drive.findAll({
+                        where: {
+                            parent_id: sourceId
+                        }
+                    }).then(function (drives) {
+                        if (drives)
+                            resolve(drives);
+                        else {
+                            // TODO: Verify if this case happens when a folder is empty vs. when there is an error
+                            resolve(sourceRow);
+                            //var msg = `Error: Failed to find a match for parentUnknown fileType detected:${isFile}`;
+                            //console.log(msg);
+                            //reject(msg);
+                        }
+                    });
+
+                } else if (isFile == 2) {
+                    // file
+                    resolve(sourceRow);
+                } else {
+                    var msg = `Error: Unknown fileType detected:${isFile}`;
+                    console.log(msg);
+                    reject(msg);
+                }
+
+            }
+            else {
+                var msg = `Failed to find "name" data for sourceId:${sourceId}`;
+                console.log(msg);
+                reject(msg);
+            }
+        });
   });
 };
 
