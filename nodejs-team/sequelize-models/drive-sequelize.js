@@ -121,6 +121,24 @@ var getFilePath = function (id) {
      })
 };
 
+exports.update = function (id , sha) {
+  console.log('In update sha');
+  return new Promise ((resolve, reject ) => {
+      models.Drive.update( { sha: sha },
+          { where: { id: id } }).
+          then(function(drive)  {
+          console.log(drive);
+          if(drive == 0) {
+            reject(`Updated Successfully`);
+          }
+          else  {
+            resolve("Updated successfully");
+          }
+        });
+      });
+
+};
+
 
 exports.move = function (sourceId, destPath) {
     console.log(`sourceId:${sourceId}  destPath:${destPath}`)
