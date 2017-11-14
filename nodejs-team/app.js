@@ -4,10 +4,8 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
 var index = require('./routes/index');
-
-var files  = require('./routes/drive-route');
+var files = require('./routes/drive-route');
 var app = express();
 
 // view engine setup
@@ -21,8 +19,12 @@ app.use('/vendor/bootstrap', express.static(
 app.use('/vendor/jquery', express.static(
   path.join(__dirname, 'bower_components', 'jquery', 'dist')));
 app.use(logger('dev'));
-app.use(bodyParser.json({ type: 'application/json' }));
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json({
+  type: 'application/json'
+}));
+app.use(bodyParser.urlencoded({
+  extended: false
+}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'drive')));

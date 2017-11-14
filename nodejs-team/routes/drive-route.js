@@ -35,71 +35,69 @@ router.get('/list', function(req, res, next) {
 
 
 router.get('/delete', function(req, res, next) {
-      console.log("delete");
-      var filePath = path.join(__dirname, '../drive', '');
-      var result = validate.check_validation(filePath);
-      if(result) {
-      fs.readdir(filePath, function(err, id) {
+  console.log("delete");
+  var filePath = path.join(__dirname, '../drive', '');
+  var result = validate.check_validation(filePath);
+  if (result) {
+    fs.readdir(filePath, function(err, id) {
       if (err)
         next(err);
       var isFile = validate.isDirectory(filePath);
-      var p =drive_sequelize.multiple(id, isFile);
+      var p = drive_sequelize.multiple(id, isFile);
       p.then(drives => {
-        if(drives == null)  {
+          if (drives == null) {
+            res.send(`Can't Delete.No File Found`);
+          } else {
+            res.json(drives);
+          }
+        })
+        .catch(err => {
           res.send(`Can't Delete.No File Found`);
-        } else {
-        res.json(drives);
-       }
-      })
-      .catch(err => {
-          res.send(`Can't Delete.No File Found`);
-         next(err);
-      });
+          next(err);
+        });
 
-  });
-}
-else {
-      res.send(`Can't Delete.Faced Issue while Execution`);
-}
+    });
+  } else {
+    res.send(`Can't Delete.Faced Issue while Execution`);
+  }
 });
 
 
 router.get('/move', function(req, res, next) {
-    console.log("router move");
-    var filePath = path.join(__dirname, '../drive', '');
-    var result = validate.check_validation(filePath);
-    if (result) {
-        fs.readdir(filePath, function (err, id, destPath) {
-            if (err)
-                next(err);
+  console.log("router move");
+  var filePath = path.join(__dirname, '../drive', '');
+  var result = validate.check_validation(filePath);
+  if (result) {
+    fs.readdir(filePath, function(err, id, destPath) {
+      if (err)
+        next(err);
 
-            //////////////////////////////////////////////////////////
-            id = 3;                 // TODO: Remove this test data! //
-            destPath = 'test path'; // TODO: Remove this test data! //
-            //////////////////////////////////////////////////////////
+      //////////////////////////////////////////////////////////
+      id = 3; // TODO: Remove this test data! //
+      destPath = 'test path'; // TODO: Remove this test data! //
+      //////////////////////////////////////////////////////////
 
-            var p = drive_sequelize.move(id, destPath);
-            p.then(fileId => {
-                res.json(JSON.stringify(p));
-            })
-            .catch(err => {
-                next(err);
-            });
+      var p = drive_sequelize.move(id, destPath);
+      p.then(fileId => {
+          res.json(JSON.stringify(p));
+        })
+        .catch(err => {
+          next(err);
         });
-    } else {
-        res.send(`Can't move. Faced Issue while Execution`);
-    }
+    });
+  } else {
+    res.send(`Can't move. Faced Issue while Execution`);
+  }
 
 });
 
 
-router.post('/add/:id', function(req, res, next) {
+router.post('/add', function(req, res, next) {
   var src = path.join(__dirname, '../drive', '');
 
-  // console.log(` Key : ${req.params.id}`);
   var key = 0;
-  if (req.params.id!=undefined){
-    key = req.params.id;
+  if (req.body.path_id != undefined) {
+    key = req.body.path_id;
   }
   // console.log(` Key query: ${key}`);
   // console.log(`src: ${src}`);
@@ -108,44 +106,44 @@ router.post('/add/:id', function(req, res, next) {
     if (err)
       fs.mkdirSync(dest);
 
-      if (key != 0){
-        var root = drive_sequelize.get_parent(key);
-        root.then(p_drive => {
-              // console.log(`Drive : ${p_drive}`);
-              var data_promise = walkSync(src, dest, [], p_drive);
-              data_promise.then(data => {
-                  var parent = drive_sequelize.list(key);
-                  parent.then(drives => {
-                      res.send(JSON.stringify(drives));
-                    })
-                    .catch(err => {
-                      reject(err);
-                    });
-
+    if (key != 0) {
+      var root = drive_sequelize.get_parent(key);
+      root.then(p_drive => {
+          // console.log(`Drive : ${p_drive}`);
+          var data_promise = walkSync(src, dest, [], p_drive);
+          data_promise.then(data => {
+              var parent = drive_sequelize.list(key);
+              parent.then(drives => {
+                  res.status(200).send(JSON.stringify(drives));
                 })
                 .catch(err => {
-                  next(err);
+                  reject(err);
                 });
-          })
-          .catch(err => {
-            reject(err);
-          });
-      }else{
-        var data_promise = walkSync(src, dest, [], null);
-        data_promise.then(data => {
+
+            })
+            .catch(err => {
+              next(err);
+            });
+        })
+        .catch(err => {
+          reject(err);
+        });
+    } else {
+      var data_promise = walkSync(src, dest, [], null);
+      data_promise.then(data => {
           console.log(`Key qu :${key}`);
-            var parent = drive_sequelize.list(key);
-            parent.then(drives => {
-                res.send(JSON.stringify(drives));
-              })
-              .catch(err => {
-                reject(err);
-              });
-          })
-          .catch(err => {
-            next(err);
-          });
-      }
+          var parent = drive_sequelize.list(key);
+          parent.then(drives => {
+              res.status(200).send(JSON.stringify(drives));
+            })
+            .catch(err => {
+              reject(err);
+            });
+        })
+        .catch(err => {
+          next(err);
+        });
+    }
 
   });
 
