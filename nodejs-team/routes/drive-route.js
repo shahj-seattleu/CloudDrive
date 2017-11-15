@@ -23,7 +23,7 @@ router.get('/list', function(req, res, next) {
       res.json(JSON.stringify(drives));
     })
     .catch(err => {
-      res.status(404).send({ error: "No Drive found" });
+      res.status(404).send({ error: err});
     });
 
 });
@@ -87,7 +87,6 @@ router.get('/move', function(req, res, next) {
 
 router.post('/add', function(req, res, next) {
   var src = path.join(__dirname, '../drive', '');
-
   var key = 0;
   if (req.body.path_id != undefined) {
     key = req.body.path_id;
