@@ -48,11 +48,9 @@ exports.get_drive = function(id) {
 
 
 exports.list = function(sourceId) {
-  console.log(`exports.list -- sourceId:${sourceId}`)
-
   return new Promise((resolve, reject) => {
-
     var isFile;
+    console.log(`ID:${sourceId}`)
 
     // Find the name of the file/folder that we're moving
     models.Drive.findById(sourceId).then(function(sourceRow) {

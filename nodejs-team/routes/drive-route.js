@@ -15,8 +15,8 @@ router.get('/list', function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-  With, Content-Type, Accept");
   var key = 0;
-  if (req.params.path_id != undefined) {
-    key = req.params.path_id;
+  if (req.query.path_id) {
+    key = req.query.path_id;
   }
   var p = drive_sequelize.list(key);
   p.then(drives => {
@@ -217,6 +217,7 @@ var walkSync = function(dir, dest, filelist, data) {
               child.then(drive => {
                   copyFile(path.join(dir, file), path.join(dest, file));
                   filelist.push(file);
+
                 })
                 .catch(err => {
                   return;
