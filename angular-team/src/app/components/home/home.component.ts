@@ -25,6 +25,10 @@ export class HomeComponent implements OnInit {
     });
   }
 
+  onDownload(post:Post) {
+  console.log('onDownload pressed');
+   }
+
 
 
 };

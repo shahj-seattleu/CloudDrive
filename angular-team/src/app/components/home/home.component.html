@@ -44,9 +44,10 @@
 
       <div class="row">
         <div class="card">
-          <img data-src="img/folderimage.png" alt="Folder image cap">
+          <!-- <img src="assets/img/folderImage.png" alt=""> -->
           <h4>{{post.name}}</h4>
           <p class="card-text">{{post.path}}</p>
+          <button *ngIf="post.fileType==2" type="button" (click)="onDownload(post)">Download</button>
         </div>
       </div>
 
