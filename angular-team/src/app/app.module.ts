@@ -9,11 +9,13 @@ import { AppComponent } from './app.component';
 import { UserComponent } from './components/user/user.component';
 import { AboutComponent } from './components/about/about.component';
 import { HomeComponent } from './components/home/home.component';
+import { FilesinfolderComponent } from './components/filesinfolder/filesinfolder.component';
 
 const appRoutes: Routes = [
   {path: '', component: HomeComponent},
   {path: 'user', component: UserComponent},
-  {path: 'about', component: AboutComponent}
+  {path: 'about', component: AboutComponent},
+  {path: 'filesinfolder', component: FilesinfolderComponent}
 
 ];
 @NgModule({
@@ -21,7 +23,8 @@ const appRoutes: Routes = [
     AppComponent,
     UserComponent,
     AboutComponent,
-    HomeComponent
+    HomeComponent,
+    FilesinfolderComponent
   ],
   imports: [
     BrowserModule,

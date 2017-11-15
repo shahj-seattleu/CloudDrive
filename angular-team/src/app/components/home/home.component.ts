@@ -8,7 +8,7 @@ import {DataService} from '../../services/data.service';
 })
 export class HomeComponent implements OnInit {
 
-  posts: Post[];
+  folder: Folder[];
 
   constructor(private dataservice:DataService) {
     console.log('Constructor ran...')
@@ -17,11 +17,11 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
     console.log('ngOnInit ran successfuly ...');
-    this.dataservice.getPosts().subscribe((posts) => {
+    this.dataservice.getFolder().subscribe((folders) => {
       // console.log(JSON.parse(posts));
 
 
-      this.posts = JSON.parse(posts);
+      this.folder = JSON.parse(folders);
     });
   }
 
@@ -29,7 +29,7 @@ export class HomeComponent implements OnInit {
 
 };
 
-interface Post{
+interface Folder{
   id:Number,
   parent_id: Number,
   name: String,

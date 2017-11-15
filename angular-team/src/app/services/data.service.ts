@@ -9,8 +9,13 @@ export class DataService {
     console.log('Data Service Connected ...');
 
   };
-  getPosts(){
+  getFolder(){
     return this.http.get('http://127.0.0.1:3000/files/list?path_id=0')
+    .map(res => res.json());
+  }
+
+  getFile(){
+    return this.http.get('https://jsonplaceholder.typicode.com/posts')
     .map(res => res.json());
   }
 
