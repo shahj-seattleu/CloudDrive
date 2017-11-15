@@ -23,7 +23,7 @@ router.get('/list', function(req, res, next) {
       res.json(JSON.stringify(drives));
     })
     .catch(err => {
-      next(err);
+      res.status(404).send({ error: "No Drive found" });
     });
 
 });
@@ -42,18 +42,14 @@ router.post('/delete', function(req, res, next) {
         var isFile = validate.isDirectory(drive.path);
         var mul = drive_sequelize.multiple(key, isFile);
         mul.then(drives => {
-
           })
           .catch(err => {
-            res.send(`Can't Delete.No File Found`);
-            // needs to give an error json
-            next(err);
+            res.status(404).send({ error: err});
           });
       }
     })
     .catch(err => {
-      res.send(`Can't Delete.No File Found`);
-      next(err);
+          res.status(404).send({ error: err});
     });
 
 
@@ -67,7 +63,7 @@ router.get('/move', function(req, res, next) {
   if (result) {
     fs.readdir(filePath, function(err, id, destPath) {
       if (err)
-        next(err);
+        res.status(404).send({ error: err });
 
       //////////////////////////////////////////////////////////
       id = 3; // TODO: Remove this test data! //
@@ -79,11 +75,11 @@ router.get('/move', function(req, res, next) {
           res.json(JSON.stringify(p));
         })
         .catch(err => {
-          next(err);
+          res.status(404).send({ error: err });
         });
     });
   } else {
-    res.send(`Can't move. Faced Issue while Execution`);
+        res.status(404).send({ error: "Can't Move.No File Found" });
   }
 
 });
@@ -115,7 +111,7 @@ router.post('/add', function(req, res, next) {
               res.status(200).send(JSON.stringify(drives));
             })
             .catch(err => {
-              next(err);
+              res.status(404).send({ error:err });
             });
         })
         .catch(err => {
@@ -128,7 +124,7 @@ router.post('/add', function(req, res, next) {
           res.status(200).send(JSON.stringify(drives));
         })
         .catch(err => {
-          next(err);
+            res.status(404).send({ error: err });
         });
     }
 
