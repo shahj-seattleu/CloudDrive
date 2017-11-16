@@ -30,18 +30,22 @@ router.get('/list', function(req, res, next) {
 
 
 
-router.post('/delete', function(req, res, next) {
-
+router.get('/delete', function(req, res, next) {
+console.log('here');
   var key = 0;
   if (req.body.path_id != undefined) {
     key = req.body.path_id;
   }
   var p = drive_sequelize.get_drive(key);
+
   p.then(drive => {
       if (drive) {
+        console.log('pathhhhh'+drive.path);
         var isFile = validate.isDirectory(drive.path);
         var mul = drive_sequelize.multiple(key, isFile);
+      
         mul.then(drives => {
+            res.json(JSON.stringify(drives));
           })
           .catch(err => {
             res.status(404).send({ error: err});
