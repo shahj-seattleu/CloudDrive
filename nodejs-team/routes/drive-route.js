@@ -23,7 +23,7 @@ router.get('/list', function(req, res, next) {
       res.json(JSON.stringify(drives));
     })
     .catch(err => {
-      res.status(404).send({ error: "No Drive found" });
+      res.status(404).send({ error: err});
     });
 
 });
@@ -46,6 +46,33 @@ router.post('/delete', function(req, res, next) {
           .catch(err => {
             res.status(404).send({ error: err});
           });
+      }
+    })
+    .catch(err => {
+          res.status(404).send({ error: err});
+    });
+
+
+});
+
+router.post('/download', function(req, res, next) {
+
+  console.log(`This is called or not`);
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-  With, Content-Type, Accept");
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+
+
+  var key = 0;
+  if (req.body.path_id!=undefined) {
+    key = req.body.path_id;
+  }
+  console.log(`${key}`);
+  var p = drive_sequelize.get_drive(32);
+  p.then(drive => {
+      if (drive) {
+        res.json(JSON.stringify(drive.path));
       }
     })
     .catch(err => {
@@ -87,7 +114,6 @@ router.get('/move', function(req, res, next) {
 
 router.post('/add', function(req, res, next) {
   var src = path.join(__dirname, '../drive', '');
-
   var key = 0;
   if (req.body.path_id != undefined) {
     key = req.body.path_id;

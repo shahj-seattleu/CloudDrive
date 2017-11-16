@@ -18,7 +18,12 @@ export class FilesinfolderComponent implements OnInit {
   ngOnInit() {
 
     console.log('files in folder ngOnInit ran successfuly ...');
-    
+    this.dataservice.getFile(this.newfile).subscribe((file) => {
+      // console.log(JSON.parse(posts));
+
+
+      this.newfile = JSON.parse(file);
+    });
   }
 
 }

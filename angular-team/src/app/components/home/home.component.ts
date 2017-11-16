@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {DataService} from '../../services/data.service';
+import { DataService } from '../../services/data.service';
 // const parseJson = require('parse-json');
 @Component({
   selector: 'app-home',
@@ -12,10 +12,10 @@ export class HomeComponent implements OnInit {
   newfile: NewFile[];
 
 
-  constructor(private dataservice:DataService) {
+  constructor(private dataservice: DataService) {
     console.log('Constructor ran...')
 
-   }
+  }
 
   ngOnInit() {
     console.log('ngOnInit ran successfuly ...');
@@ -29,6 +29,7 @@ export class HomeComponent implements OnInit {
     
   }
 
+<<<<<<< HEAD
   onClickFolder(folder: Folder){
     console.log("folder was clicked successfully");
     this.dataservice.getFile(folder).subscribe((folders) => {
@@ -51,10 +52,20 @@ export class HomeComponent implements OnInit {
     
   }
   
+=======
+  onDownload(post: Post) {
+    console.log('onDownload pressed');
+    this.dataservice.downloadFile(post.id).subscribe((status) => {
+      console.log('status:', status);
+    });
+  }
+
+>>>>>>> f6b15f3541261d651e388d2c75a01a96de1163b8
 
 
 };
 
+<<<<<<< HEAD
 interface Folder{
   id:Number,
   parent_id: Number,
@@ -67,11 +78,15 @@ interface Folder{
 }
 interface NewFile{
   id:Number,
+=======
+interface Post {
+  id: Number,
+>>>>>>> f6b15f3541261d651e388d2c75a01a96de1163b8
   parent_id: Number,
   name: String,
   path: String,
-  fileType:Number,
-  size:Number
+  fileType: Number,
+  size: Number
 
 
 }
