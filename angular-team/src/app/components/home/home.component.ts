@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {DataService} from '../../services/data.service';
+import { DataService } from '../../services/data.service';
 // const parseJson = require('parse-json');
 @Component({
   selector: 'app-home',
@@ -10,10 +10,10 @@ export class HomeComponent implements OnInit {
 
   posts: Post[];
 
-  constructor(private dataservice:DataService) {
+  constructor(private dataservice: DataService) {
     console.log('Constructor ran...')
 
-   }
+  }
 
   ngOnInit() {
     console.log('ngOnInit ran successfuly ...');
@@ -25,21 +25,24 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  onDownload(post:Post) {
-  console.log('onDownload pressed');
-   }
+  onDownload(post: Post) {
+    console.log('onDownload pressed');
+    this.dataservice.downloadFile(post.id).subscribe((status) => {
+      console.log('status:', status);
+    });
+  }
 
 
 
 };
 
-interface Post{
-  id:Number,
+interface Post {
+  id: Number,
   parent_id: Number,
   name: String,
   path: String,
-  fileType:Number,
-  size:Number
+  fileType: Number,
+  size: Number
 
 
 }

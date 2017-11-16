@@ -55,6 +55,33 @@ router.post('/delete', function(req, res, next) {
 
 });
 
+router.post('/download', function(req, res, next) {
+
+  console.log(`This is called or not`);
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-  With, Content-Type, Accept");
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+
+
+  var key = 0;
+  if (req.body.path_id!=undefined) {
+    key = req.body.path_id;
+  }
+  console.log(`${key}`);
+  var p = drive_sequelize.get_drive(32);
+  p.then(drive => {
+      if (drive) {
+        res.json(JSON.stringify(drive.path));
+      }
+    })
+    .catch(err => {
+          res.status(404).send({ error: err});
+    });
+
+
+});
+
 
 router.get('/move', function(req, res, next) {
   console.log("router move");
