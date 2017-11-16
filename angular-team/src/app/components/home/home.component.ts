@@ -29,7 +29,6 @@ export class HomeComponent implements OnInit {
     
   }
 
-<<<<<<< HEAD
   onClickFolder(folder: Folder){
     console.log("folder was clicked successfully");
     this.dataservice.getFile(folder).subscribe((folders) => {
@@ -52,36 +51,17 @@ export class HomeComponent implements OnInit {
     
   }
   
-=======
-  onDownload(post: Post) {
+  onDownload(folder: Folder) {
     console.log('onDownload pressed');
-    this.dataservice.downloadFile(post.id).subscribe((status) => {
-      console.log('status:', status);
-    });
+    
   }
 
->>>>>>> f6b15f3541261d651e388d2c75a01a96de1163b8
 
 
 };
 
-<<<<<<< HEAD
-interface Folder{
-  id:Number,
-  parent_id: Number,
-  name: String,
-  path: String,
-  fileType:Number,
-  size:Number
-
-
-}
-interface NewFile{
-  id:Number,
-=======
-interface Post {
+interface Folder {
   id: Number,
->>>>>>> f6b15f3541261d651e388d2c75a01a96de1163b8
   parent_id: Number,
   name: String,
   path: String,
@@ -90,4 +70,13 @@ interface Post {
 
 
 }
+interface NewFile {
+  id: Number,
+  parent_id: Number,
+  name: String,
+  path: String,
+  fileType: Number,
+  size: Number
 
+
+}
