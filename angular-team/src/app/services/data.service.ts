@@ -10,13 +10,22 @@ export class DataService {
 
   };
   getFolder(){
-    return this.http.get('http://127.0.0.1:3000/files/list?path_id=0')
+return this.http.get('https://jsonplaceholder.typicode.com/posts')
     .map(res => res.json());
   }
 
-  getFile(){
-    return this.http.get('https://jsonplaceholder.typicode.com/posts')
-    .map(res => res.json());
+  getFile(folder){
+    //should return files in a folder
+
+    //check if folder is empty
+    if(folder.length == 0 || !folder){
+      console.log("empty folder");
+      return;
+    }else{
+      return this.http.get('https://jsonplaceholder.typicode.com/posts')
+      .map(res => res.json());
+    }
+    
   }
 
 }

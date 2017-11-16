@@ -33,20 +33,20 @@
     <h1 class="jumbotron-heading">Welcome! </h1>
     <p class="lead text-muted">Here are your folders.</p>
     <p>
-      <a href="#" class="btn btn-primary">Upload New Folder</a>
-      <a href="#" class="btn btn-secondary">Uploade New File</a>
+      <a href="#" class="btn btn-primary" (click)="onClickUpload()">Upload New Folder</a>
+      <a href="#" class="btn btn-secondary" (click)="onClickDownload()">Uploade New File</a>
     </p>
   </div>
 </section>
 
 <div class="folder text-muted">
-  <div class="container" *ngFor='let post of posts'>
+  <div class="container" *ngFor='let folder of folders'>
 
-      <div class="row">
+      <div class="row" (click)="onClickFolder(folder)">
         <div class="card">
           <img data-src="img/folderimage.png" alt="Folder image cap">
-          <h4>{{post.name}}</h4>
-          <p class="card-text">{{post.path}}</p>
+          <h4>{{folder.name}}</h4>
+          <p class="card-text">{{folder.path}}</p>
         </div>
       </div>
 
