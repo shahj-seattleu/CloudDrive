@@ -221,7 +221,7 @@ var walkSync = function(dir, dest, filelist, data) {
                   filelist.push(file);
                    var sha_encyp = sha.getHash_Checksum(destDir);
                    sha_encyp.then(dat => {
-                     drive_sequelize.update_SHA(data.id, dat);
+                     drive_sequelize.update_SHA(drive.id, dat);
                    }).catch(err => {
                      next(err);
                    });
@@ -242,7 +242,7 @@ var walkSync = function(dir, dest, filelist, data) {
                   filelist.push(file);
                   var sha_encyp = sha.getHash_Checksum(destDir);
                   sha_encyp.then(data => {
-                      drive_sequelize.update_SHA(0, data);
+                        drive_sequelize.update_SHA(drive.id, data);
                   }).catch(err => {
                      next(err);
                    });

@@ -171,7 +171,7 @@ var getFilePath = function(id) {
 
 
 exports.update_SHA = function(id, sha) {
-  console.log('In update sha'+sha);
+  console.log('In update sha'+sha +' with id ='+ id);
   return new Promise((resolve, reject) => {
     models.Drive.update({
       sha_256: sha
