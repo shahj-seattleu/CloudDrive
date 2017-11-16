@@ -219,16 +219,17 @@ var walkSync = function(dir, dest, filelist, data) {
               child.then(drive => {
                   copyFile(path.join(dir, file), path.join(dest, file));
                   filelist.push(file);
+                   var sha_encyp = sha.getHash_Checksum(destDir);
+                   sha_encyp.then(dat => {
+                     drive_sequelize.update_SHA(data.id, dat);
+                   }).catch(err => {
+                     next(err);
+                   });
                 })
                 .catch(err => {
                   return;
                 });
-              // var sha_encyp = sha.getHash_Checksum(destDir);
-              // sha_encyp.then(data => {
-              //   drive_sequelize.update(data.id, sha_encyp);
-              // }).catch(err => {
-              //   next(err);
-              // });
+
             });
 
           } else {
@@ -239,17 +240,18 @@ var walkSync = function(dir, dest, filelist, data) {
               child.then(drive => {
                   copyFile(path.join(dir, file), path.join(dest, file));
                   filelist.push(file);
+                  var sha_encyp = sha.getHash_Checksum(destDir);
+                  sha_encyp.then(data => {
+                      drive_sequelize.update_SHA(0, data);
+                  }).catch(err => {
+                     next(err);
+                   });
 
                 })
                 .catch(err => {
                   return;
                 });
-              // var sha_encyp = sha.getHash_Checksum(destDir);
-              // sha_encyp.then(data => {
-              //   drive_sequelize.update(0, sha_encyp);
-              // }).catch(err => {
-              //   next(err);
-              // });
+
             });
 
           }
