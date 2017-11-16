@@ -28,6 +28,30 @@ router.get('/list', function(req, res, next) {
 
 });
 
+router.get('/sha', function(req, res, next) {
+  var key = 0;
+  if (req.body.path_id != undefined) {
+    key = req.body.path_id;
+  }
+  var path = drive_sequelize.getFilePath(key);
+  path.then(drive => {
+      if (drive) {
+        var isFile = validate.isDirectory(drive.path);
+        if(!isFile) {
+         var sha_encyp = sha.getHash_Checksum(drive.path);
+         sha_encyp.then(dat => {
+               res.json(JSON.stringify(dat));
+         }).catch(err => {
+           next(err);
+         });
+       }
+      }
+    })
+    .catch(err => {
+          res.status(404).send({ error: err});
+    });
+
+});
 
 
 router.get('/delete', function(req, res, next) {
@@ -43,7 +67,7 @@ console.log('here');
         console.log('pathhhhh'+drive.path);
         var isFile = validate.isDirectory(drive.path);
         var mul = drive_sequelize.multiple(key, isFile);
-      
+
         mul.then(drives => {
             res.json(JSON.stringify(drives));
           })

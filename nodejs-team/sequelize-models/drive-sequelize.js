@@ -45,6 +45,15 @@ exports.get_drive = function(id) {
   });
 };
 
+exports.getFilePath = function(id) {
+  console.log("getFilePath" + id);
+  return models.Drive.find({
+    where: {
+      id: id
+    }
+  })
+
+}
 
 exports.list = function(sourceId) {
   return new Promise((resolve, reject) => {
