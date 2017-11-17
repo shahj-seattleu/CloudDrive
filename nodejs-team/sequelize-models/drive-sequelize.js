@@ -102,7 +102,7 @@ exports.get_parent = function(id) {
   return new Promise((resolve, reject) => {
     models.Drive.find({
       where: {
-        parent_id: id,
+        id: id,
         fileType: 1
       }
     }).then(function(drive) {

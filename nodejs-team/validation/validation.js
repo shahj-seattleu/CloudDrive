@@ -11,7 +11,6 @@ var isValidFilePath = function(filepath) {
 exports.isDirectory = function(filePath) {
   return fs.lstatSync(filePath).isDirectory();
 }
-//needs $ npm install --save path-exists
 var ispathExist = function(filepath) {
   if (fs.lstatSync(filepath).isDirectory()) {
     if (fs.existsSync(filepath)) {
@@ -32,11 +31,9 @@ var ispathExist = function(filepath) {
 }
 
 exports.getSize = function(filepath) {
-
   const stats = fs.statSync(filepath);
   const fileSizeInBytes = stats.size;
   return fileSizeInBytes;
-
 }
 
 //Check if the size of the file is less than 2MB
@@ -62,7 +59,8 @@ function checkExtension(filepath) {
   var extension = fileExtension(filepath);
   if (!extension.includes(".")) {
     return true;
-  } else if (extension == ".zip" || extension == ".doc" || extension == ".pdf" || extension == ".txt") {
+  } else if (extension == ".zip" || extension == ".doc" || extension == ".pdf" || extension == ".txt" ||
+    extension == ".png") {
     return true;
   } else {
     return false;
@@ -72,19 +70,15 @@ function checkExtension(filepath) {
 
 //Main Validation method
 exports.check_validation = function(filepath) {
+  return new Promise((resolve, reject) => {
   var result = isValidFilePath(filepath);
   var result1 = ispathExist(filepath);
   var result2 = isCheckSize(filepath);
   var result3 = checkExtension(filepath);
-
   if (result && result1 && result2 && result3) {
-    console.log("true");
-    return Promise.resolve(true);
+    resolve(true);
   } else {
-    console.log("false");
-    return Promise.resolve(true);
-
-
+    resolve(false);
   }
-
+});
 }

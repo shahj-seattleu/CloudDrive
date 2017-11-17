@@ -22,7 +22,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json({
   type: 'application/json'
 }));
-app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
   extended: true
 }));
 app.use(cookieParser());
