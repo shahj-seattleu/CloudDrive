@@ -23,7 +23,9 @@ router.get('/list', function(req, res, next) {
       res.json(JSON.stringify(drives));
     })
     .catch(err => {
-      res.status(404).send({ error: err});
+      res.status(404).send({
+        error: err
+      });
     });
 
 });
@@ -37,25 +39,27 @@ router.get('/sha', function(req, res, next) {
   path.then(drive => {
       if (drive) {
         var isFile = validate.isDirectory(drive.path);
-        if(!isFile) {
-         var sha_encyp = sha.getHash_Checksum(drive.path);
-         sha_encyp.then(dat => {
-               res.json(JSON.stringify(dat));
-         }).catch(err => {
-           next(err);
-         });
-       }
+        if (!isFile) {
+          var sha_encyp = sha.getHash_Checksum(drive.path);
+          sha_encyp.then(dat => {
+            res.json(JSON.stringify(dat));
+          }).catch(err => {
+            next(err);
+          });
+        }
       }
     })
     .catch(err => {
-          res.status(404).send({ error: err});
+      res.status(404).send({
+        error: err
+      });
     });
 
 });
 
 
 router.get('/delete', function(req, res, next) {
-console.log('here');
+  console.log('here');
   var key = 0;
   if (req.body.path_id != undefined) {
     key = req.body.path_id;
@@ -64,7 +68,7 @@ console.log('here');
 
   p.then(drive => {
       if (drive) {
-        console.log('pathhhhh'+drive.path);
+        console.log('pathhhhh' + drive.path);
         var isFile = validate.isDirectory(drive.path);
         var mul = drive_sequelize.multiple(key, isFile);
 
@@ -72,12 +76,16 @@ console.log('here');
             res.json(JSON.stringify(drives));
           })
           .catch(err => {
-            res.status(404).send({ error: err});
+            res.status(404).send({
+              error: err
+            });
           });
       }
     })
     .catch(err => {
-          res.status(404).send({ error: err});
+      res.status(404).send({
+        error: err
+      });
     });
 
 
@@ -85,26 +93,25 @@ console.log('here');
 
 router.post('/download', function(req, res, next) {
 
-  console.log(`This is called or not`);
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-  With, Content-Type, Accept");
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
 
-
   var key = 0;
-  if (req.body.path_id!=undefined) {
+  if (req.body.path_id != undefined) {
     key = req.body.path_id;
   }
-  console.log(`${key}`);
-  var p = drive_sequelize.get_drive(32);
+  var p = drive_sequelize.get_drive(key);
   p.then(drive => {
       if (drive) {
         res.json(JSON.stringify(drive.path));
       }
     })
     .catch(err => {
-          res.status(404).send({ error: err});
+      res.status(404).send({
+        error: err
+      });
     });
 
 
@@ -118,7 +125,9 @@ router.get('/move', function(req, res, next) {
   if (result) {
     fs.readdir(filePath, function(err, id, destPath) {
       if (err)
-        res.status(404).send({ error: err });
+        res.status(404).send({
+          error: err
+        });
 
       //////////////////////////////////////////////////////////
       id = 3; // TODO: Remove this test data! //
@@ -130,11 +139,15 @@ router.get('/move', function(req, res, next) {
           res.json(JSON.stringify(p));
         })
         .catch(err => {
-          res.status(404).send({ error: err });
+          res.status(404).send({
+            error: err
+          });
         });
     });
   } else {
-        res.status(404).send({ error: "Can't Move.No File Found" });
+    res.status(404).send({
+      error: "Can't Move.No File Found"
+    });
   }
 
 });
@@ -165,7 +178,9 @@ router.post('/add', function(req, res, next) {
               res.status(200).send(JSON.stringify(drives));
             })
             .catch(err => {
-              res.status(404).send({ error:err });
+              res.status(404).send({
+                error: err
+              });
             });
         })
         .catch(err => {
@@ -178,7 +193,9 @@ router.post('/add', function(req, res, next) {
           res.status(200).send(JSON.stringify(drives));
         })
         .catch(err => {
-            res.status(404).send({ error: err });
+          res.status(404).send({
+            error: err
+          });
         });
     }
 
@@ -245,14 +262,20 @@ var walkSync = function(dir, dest, filelist, data) {
             fs.access(destDir, (err) => {
               var child = drive_sequelize.create(data.id, file, destDir, 2, stats["size"]);
               child.then(drive => {
-                  copyFile(path.join(dir, file), path.join(dest, file));
+                  var sha_ret = copyFile(path.join(dir, file), path.join(dest, file));
+                  sha_ret.then(sha_data => {
+                      var update_sha = drive_sequelize.update_SHA(drive.id, sha_data);
+                      update_sha.then(status => {
+                          console.log(status);
+                        })
+                        .catch(err => {
+                          return;
+                        });
+                    })
+                    .catch(err => {
+                      return;
+                    });
                   filelist.push(file);
-                   var sha_encyp = sha.getHash_Checksum(destDir);
-                   sha_encyp.then(dat => {
-                     drive_sequelize.update_SHA(drive.id, dat);
-                   }).catch(err => {
-                     next(err);
-                   });
                 })
                 .catch(err => {
                   return;
@@ -266,14 +289,20 @@ var walkSync = function(dir, dest, filelist, data) {
             fs.access(destDir, (err) => {
               var child = drive_sequelize.create(0, file, destDir, 2, stats["size"]);
               child.then(drive => {
-                  copyFile(path.join(dir, file), path.join(dest, file));
+                  var sha_ret = copyFile(path.join(dir, file), path.join(dest, file));
+                  sha_ret.then(sha_data => {
+                      var update_sha = drive_sequelize.update_SHA(drive.id, sha_data);
+                      update_sha.then(status => {
+                          console.log(status);
+                        })
+                        .catch(err => {
+                          return;
+                        });
+                    })
+                    .catch(err => {
+                      return;
+                    });
                   filelist.push(file);
-                  var sha_encyp = sha.getHash_Checksum(destDir);
-                  sha_encyp.then(data => {
-                        drive_sequelize.update_SHA(drive.id, data);
-                  }).catch(err => {
-                     next(err);
-                   });
 
                 })
                 .catch(err => {
@@ -296,20 +325,28 @@ var walkSync = function(dir, dest, filelist, data) {
 
 
 function copyFile(src, dest) {
+  return new Promise((resolve, reject) => {
+    // console.log('src', src);
+    // console.log('dest', dest);
+    let readStream = fs.createReadStream(src);
 
-  // console.log('src', src);
-  // console.log('dest', dest);
-  let readStream = fs.createReadStream(src);
+    readStream.once('error', (err) => {
+      console.log(err);
+      if (err) return reject(err);
+    });
 
-  readStream.once('error', (err) => {
-    console.log(err);
+    readStream.once('end', () => {
+      // console.log('done copying');
+      var sha_encyp = sha.getHash_Checksum(dest);
+      sha_encyp.then(sha_data => {
+        resolve(sha_data);
+      }).catch(err => {
+        reject(err);
+      });
+    });
+
+    readStream.pipe(fs.createWriteStream(dest));
   });
-
-  readStream.once('end', () => {
-    // console.log('done copying');
-  });
-
-  readStream.pipe(fs.createWriteStream(dest));
 }
 
 
