@@ -68,9 +68,10 @@
             <div class="row" (click)="onClickFolder(folder)">
                 <div class="card">
                     <!-- <img src="assets/img/folderImage.png" alt=""> -->
-                    <h4>{{post.name}}</h4>
-                    <p class="card-text">{{post.path}}</p>
+                    <h4>{{folder.name}}</h4>
+                    <p class="card-text">{{folder.path}}</p>
                     <button *ngIf="post.fileType==2" type="button" (click)="onDownload(post)">Download</button>
+                    <button class="btn btn-danger btn-small" (click)="onDeleteClick">Delete</button>
                 </div>
             </div>
 

@@ -16,37 +16,52 @@ export class DataService {
 
     private url: any = {
         postFileUrl: "someAPI",
-        postFolderUrl: "someAPI"
+        postFolderUrl: "someAPI",
+        getFileUrl: "someAPI",
+        getFolderURL: "someApi",
+        getFilesUrl: "someAPI",
     }
-
+    //Has file data for upload to server
     postFile(data) {
+        console.log("post file data:" + data);
+        
         console.log(data);
         return this.http.post(this.url.postFileUrl, data).map((res: any) => res.json());
 
     }
-
+    //Has folder data for upload to server
     postFolder(data) {
-        console.log(data);
+        console.log("post folder data: " + data);
         
         return this.http.post(this.url.postFolderUrl, data).map((res: any) => res.json());
     }
-
-    getFolder() {
-        return this.http.get('https://jsonplaceholder.typicode.com/posts')
+    //get folder from server
+    //needs to get folder by id
+    getFolder(id: Number) {
+        const url = '${this.getFolderUrl}/${1d}';
+        return this.http.get(url)
             .map(res => res.json());
     }
 
-    getFile(folder) {
-        //should return files in a folder
-
-        //check if folder is empty
-        if (folder.length == 0 || !folder) {
-            console.log("empty folder");
-            return;
-        } else {
-            return this.http.get('https://jsonplaceholder.typicode.com/posts')
+    //get a file from server
+    //needs to get file by id
+    getFile(id: Number) {
+        const url = '${this.getFileUrl}/${1d}';
+            return this.http.get(url)
+                .map(res => res.json());
+        }
+    //get files from server
+    //should map to /list
+    getFiles() {
+            return this.http.get(this.url.getFilesUrl)
                 .map(res => res.json());
         }
 
+    deleteFile(id: Number){
+        const url = '${this.getFileUrl}/${1d}';
+        return this.http.delete(url)
+        .map(res => res.json());
     }
+        
+
 }

@@ -37,7 +37,7 @@ export class HomeComponent implements OnInit {
     private folderPath: string;
     public newFile: NewFile;
     public folder: Folder;
-
+    public folders: Array<Folder>;
 
     constructor(private dataservice: DataService) {
         console.log('Constructor ran...')
@@ -80,7 +80,7 @@ export class HomeComponent implements OnInit {
 
     ngOnInit() {
         console.log('ngOnInit ran successfuly ...');
-        this.dataservice.getFolder().subscribe((folder) => {
+        this.dataservice.getFiles().subscribe((folder) => {
             // console.log(JSON.parse(posts));
 
             this.folder = JSON.parse(folder);
@@ -104,10 +104,10 @@ export class HomeComponent implements OnInit {
         }
 
     }
-
+    //needs a rethink
     onClickFolder(folder: Folder) {
         console.log("folder was clicked successfully");
-        this.dataservice.getFile(folder).subscribe((folders) => {
+        this.dataservice.getFile(this.folder.id).subscribe((folders) => {
             // console.log(JSON.parse(posts));
 
 
@@ -152,12 +152,22 @@ export class HomeComponent implements OnInit {
             )
     };
 
-    onClickDownload() {
-        console.log("download was clicked successfully");
+    onFileDeleteClick(id) {
+        console.log("deleting " + id);
+        this.dataservice.deleteFile(id).subscribe(res => {
+            console.log(res);
+            for(let i = 0; i < this.folders.length; i++){
+                if(this.folders[i].id == id){
+                    this.folders.splice(i,1);
+                }
+            }
+            
+        });
     }
 
     onDownload(folder: Folder) {
         console.log('onDownload pressed');
+        
 
     }
 
