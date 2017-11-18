@@ -1,68 +1,91 @@
-
 <div class="collapse bg-dark" id="navbarHeader">
-  <div class="container">
-    <div class="row">
-      <div class="col-sm-8 py-4">
-        <h4 class="text-white">About</h4>
-        <p class="text-muted">Add some information about the album below, the author, or any other background context. Make it a few sentences long so folks can pick up some informative tidbits. Then, link them off to some social networking sites or contact information.</p>
-      </div>
-      <div class="col-sm-4 py-4">
-        <h4 class="text-white">Contact</h4>
-        <ul class="list-unstyled">
-          <li><a href="#" class="text-white">Follow on Twitter</a></li>
-          <li><a href="#" class="text-white">Like on Facebook</a></li>
-          <li><a href="#" class="text-white">Email me</a></li>
-        </ul>
-      </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-8 py-4">
+                <h4 class="text-white">About</h4>
+                <p class="text-muted">Add some information about the album below, the author, or any other background
+                    context. Make it a few sentences long so folks can pick up some informative tidbits. Then, link them
+                    off to some social networking sites or contact information.</p>
+            </div>
+            <div class="col-sm-4 py-4">
+                <h4 class="text-white">Contact</h4>
+                <ul class="list-unstyled">
+                    <li><a href="#" class="text-white">Follow on Twitter</a></li>
+                    <li><a href="#" class="text-white">Like on Facebook</a></li>
+                    <li><a href="#" class="text-white">Email me</a></li>
+                </ul>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
+
 <div class="navbar navbar-dark bg-dark">
-  <div class="container d-flex justify-content-between">
-    <a href="#" class="navbar-brand">SU Cloud Drive</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-  </div>
+    <div class="container d-flex justify-content-between">
+        <a href="#" class="navbar-brand">SU Cloud Drive</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarHeader"
+                aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
 </div>
 
 <main role="main">
 
-<section class="jumbotron text-center">
-  <div class="container">
-    <h1 class="jumbotron-heading">Welcome! </h1>
-    <p class="lead text-muted">Here are your folders.</p>
-    <p>
-      <a href="#" class="btn btn-primary" (click)="onClickUpload()">Upload New Folder</a>
-      <a href="#" class="btn btn-secondary" (click)="onClickDownload()">Uploade New File</a>
-    </p>
-  </div>
-</section>
+    <section class="jumbotron text-center">
+        <div class="container">
+            <h1 class="jumbotron-heading">Welcome! </h1>
+            <p class="lead text-muted">Here are your folders.</p>
 
-<div class="folder text-muted">
-  <div class="container" *ngFor='let folder of folders'>
+            <form #uploaderForm="ngForm">
 
-      <div class="row" (click)="onClickFolder(folder)">
-        <div class="card">
-          <!-- <img src="assets/img/folderImage.png" alt=""> -->
-          <h4>{{post.name}}</h4>
-          <p class="card-text">{{post.path}}</p>
-          <button *ngIf="post.fileType==2" type="button" (click)="onDownload(post)">Download</button>
+                <div class="uploadFile">
+                    <label for="file">
+                        <i class="fa fa-file" aria-hidden="true">&nbsp;</i>{{fileName}}
+                    </label>
+                    <input type="file" name="file" class="inputfile" #fileUpload="ngModel" ngModel
+                           (change)="retrieveFileData($event)" id="file">
+                </div>
+
+                <div class="uploadFile">
+                    <label for="folder">
+                        <i class="fa fa-folder-open" aria-hidden="true">&nbsp;</i>{{folderName}}
+                    </label>
+                    <input type="file" name="files[]" class="inputfile" #folderUpload="ngModel" ngModel
+                           webkitdirectory directory multiple mozdirectory
+                           (change)="retrieveFolderData($event)" id="folder">
+                </div>
+            </form>
         </div>
-      </div>
+        <button class="btn btn-primary" (click)="onClickUpload()"
+           [disabled]="this.fileName =='Select a file' && this.folderName == 'Select a folder'">submit</button>
+        <a href="#" class="btn btn-secondary" (click)="onClickDownload()">
+            download</a>
+    </section>
+
+    <div class="folder text-muted">
+        <div class="container" *ngFor='let folder of folders'>
+
+            <div class="row" (click)="onClickFolder(folder)">
+                <div class="card">
+                    <!-- <img src="assets/img/folderImage.png" alt=""> -->
+                    <h4>{{post.name}}</h4>
+                    <p class="card-text">{{post.path}}</p>
+                    <button *ngIf="post.fileType==2" type="button" (click)="onDownload(post)">Download</button>
+                </div>
+            </div>
 
 
-  </div>
-</div>
+        </div>
+    </div>
 
 </main>
 
 <footer class="text-muted">
-<div class="container">
-  <p class="float-right">
-    <a href="#">Back to top</a>
-  </p>
-  
-  <p>The Cloud Drive of the future.</p>
-</div>
+    <div class="container">
+        <p class="float-right">
+            <a href="#">Back to top</a>
+        </p>
+
+        <p>The Cloud Drive of the future.</p>
+    </div>
 </footer>
