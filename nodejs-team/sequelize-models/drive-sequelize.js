@@ -29,7 +29,6 @@ exports.create = function(id, name, path, type, size) {
   });
 };
 
-
 exports.get_drive = function(id) {
   return new Promise((resolve, reject) => {
     models.Drive.find({
@@ -46,6 +45,15 @@ exports.get_drive = function(id) {
   });
 };
 
+exports.getFilePath = function(id) {
+  console.log("getFilePath" + id);
+  return models.Drive.find({
+    where: {
+      id: id
+    }
+  })
+
+}
 
 exports.list = function(sourceId) {
   return new Promise((resolve, reject) => {
@@ -94,7 +102,7 @@ exports.get_parent = function(id) {
   return new Promise((resolve, reject) => {
     models.Drive.find({
       where: {
-        parent_id: id,
+        id: id,
         fileType: 1
       }
     }).then(function(drive) {
@@ -109,9 +117,12 @@ exports.get_parent = function(id) {
 
 
 exports.multiple = function(id, isFile) {
+  console.log('IsFile' + isFile);
+
   var p;
-  if (isFile) {
-    return delete_file(id);
+  if (!isFile) {
+    var c = delete_file(id);
+    return c;
   } else {
     var x = getFilePath(id);
     console.log('else');
@@ -142,19 +153,20 @@ exports.multiple = function(id, isFile) {
 
 
 var delete_file = function(id) {
-  console.log("delete");
-  console.log('id' + id);
+  console.log("delete with id" + id);
   return new Promise((resolve, reject) => {
     models.Drive.destroy({
       where: {
         id: id
       }
-    }).then(function(drive) {
-      if (drive == 0) {
-        reject(`Not Deleted Successfully`);
-      } else {
-        resolve("Deleted successfully");
+    }).then(affectedRows => {
+      console.log('affected' + affectedRows);
+      if (affectedRows == 1)
+        resolve(`Deleted Successfully`);
+      else {
+        reject(`Error while find a deletinf Drive model`);
       }
+      return affectedRows;
     });
   });
 };
@@ -170,8 +182,7 @@ var getFilePath = function(id) {
 };
 
 
-exports.update = function(id, sha) {
-  console.log('In update sha');
+exports.update_SHA = function(id, sha) {
   return new Promise((resolve, reject) => {
     models.Drive.update({
       sha_256: sha
@@ -180,11 +191,11 @@ exports.update = function(id, sha) {
         id: id
       }
     }).then(function(drive) {
-      console.log(drive);
+      console.log(`Return value : ${drive}`);
       if (drive == 0) {
-        reject("Failed to update SHA");
+        reject(`Failed to update SHA`);
       } else {
-        resolve("Updated successfully");
+        resolve(`Updated successfully`);
       }
     });
   });
