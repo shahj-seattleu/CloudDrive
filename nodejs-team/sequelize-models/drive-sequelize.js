@@ -121,7 +121,43 @@ exports.list = function(id) {
     });
     };
 
+exports.get_childdrive = function(id) {
+  if (id == 0) {
+    return new Promise((resolve, reject) => {
+      models.Drive.find({
 
+        where: {
+          parent_id: id
+        }
+      }).then(function(drive) {
+        if (drive)
+          resolve(drive);
+        else {
+          reject(`Error while get drive`);
+        }
+      }).catch(err => {
+        reject(`Error while get drive`);
+      });
+    });
+} else {
+  return new Promise((resolve, reject) => {
+    models.Drive.find({
+      where: {
+        id: id
+      }
+    }).then(function(drive) {
+      if (drive)
+        resolve(drive);
+      else {
+        reject(`Error while get drive`);
+      }
+    }).catch(err => {
+      reject(`Error while get drive`);
+    });
+  });
+
+}
+};
 exports.get_parent = function(id) {
   return new Promise((resolve, reject) => {
     models.Drive.find({
