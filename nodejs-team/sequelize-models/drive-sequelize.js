@@ -155,7 +155,7 @@ var delete_file = function(id) {
       if (affectedRows==1)
         resolve(`Deleted Successfully`);
       else {
-        reject(`Error while find a deletinf Drive model`);
+        reject(`Unable to find a matching Drive model`);
       }
       return affectedRows;
     });
@@ -200,55 +200,93 @@ exports.move = function(sourceId, destPath) {
   return new Promise((resolve, reject) => {
 
     var destRootPath = path.join(__dirname, '../public/cloud/');
+    var destSearchPath;
     var destFullPath;
     var destFileName;
-    var isFile;
+    var sourceFileType;
+    var sourceRootPath;
+    var msg;
 
-    // Find the name of the file/folder that we're moving
+    // First perform basic error checking on the parameters
+    if (sourceId <= 0) {
+      msg = `Invalid sourceId:${sourceId}`;
+      console.log(msg);
+      return reject(msg);
+    } else if (!destPath) {
+      msg = `Invalid destPath:'${destPath}'`;
+      console.log(msg);
+      return reject(msg);
+    }
+
+    // Find the name of the source file/folder that we're moving
     models.Drive.findById(sourceId).then(function(sourceRow) {
       if (sourceRow) {
         destFileName = sourceRow.name;
-        isFile = sourceRow.fileType;
+        sourceFileType = sourceRow.fileType;
+        sourceRootPath = sourceRow.path;
       } else {
-        var msg = `Failed to find "name" data for sourceId:${sourceId}`;
+        msg = `Failed to find data for sourceId:${sourceId}`;
         console.log(msg);
-        reject(msg);
+        return reject(msg);
       }
 
-      // Use the destination path provided in the function
-      if (destPath) {
-        // Build the path from the filename and destination path
-        if (isFile == 1) {
-          destFullPath = path.join(destPath, destFileName, '\\');
-        } else if (isFile == 2) {
-          destFullPath = path.join(destPath, destFileName);
-        }
-      } else {
-        var msg = `Path not valid (destPath):${destPath}`;
-        console.log(msg);
-        reject(msg);
-      }
-
-      console.log(`destFullPath full path: '${destFullPath}'`);
+      destSearchPath = path.join(destPath, '/');
+      console.log(`destSearchPath: '${destSearchPath}'`);
 
       // Find new parent ID
       var destParentId;
+      var destFileType;
       models.Drive.find({
         where: {
-          path: destPath
+          path: destSearchPath
         }
-      }).then(function(sourceRow) {
-        if (sourceRow) {
-          destParentId = sourceRow.id;
-        } else if (destRootPath == destPath) {
+      }).then(function(destRow) {
+        if (destRow) {
+          // Found the path specified, use it's ID as the new parentId
+          destParentId = destRow.id;
+          destFileType = destRow.fileType;
+        } else if (destRootPath == destSearchPath) {
+          // The path was not found, but it's the same as the root,
+          // so set the root (0) as the parentId
           destParentId = 0;
+          destFileType = 1;
         } else {
-          var msg = `Failed to find "Id" data for destPath:${destPath}`;
+          // Unable to find the path
+          msg = `Failed to find data for destPath:${destSearchPath}`;
           console.log(msg);
-          reject(msg);
+          return reject(msg);
         }
 
-        //Update the database with the new path for the sourceId
+        // Sanity check -- validate that we can actually move from the source
+        // to the specified destination
+        if (sourceRow.id == destParentId) {
+          msg = `Cannot move sourceId:${sourceId} to the same file/folder! (destSearchPath: '${destSearchPath}')`;
+          console.log(msg);
+          return reject(msg);
+        } else if (sourceRow.parent_id == destParentId) {
+          msg = `Cannot move sourceId:${sourceId} to the same parent folder! (destSearchPath: '${destSearchPath}')`;
+          console.log(msg);
+          return reject(msg);
+        } else if (destFileType != 1) {
+          msg = `Cannot move sourceId:${sourceId} to an existing file!`;
+          console.log(msg);
+          return reject(msg);
+        } else if (destSearchPath.indexOf(sourceRootPath) >= 0) {
+          msg = `Cannot move sourceId:${sourceId} to a path within itself! (destSearchPath: '${destSearchPath}')`;
+          console.log(msg);
+          return reject(msg);
+        }
+
+        // Build the path from the filename and destination path
+        destFullPath = path.join(destSearchPath, destFileName);
+        if (sourceFileType == 1) {
+          // Destination is a path, so make sure there's a trailing slash
+          destFullPath = path.join(destFullPath, '/');
+        }
+
+        console.log(`destFullPath: '${destFullPath}'`);
+
+        // Update the source file/folder in the database with the new path and parentId
         models.Drive.update({
           parent_id: destParentId,
           path: destFullPath
@@ -258,30 +296,55 @@ exports.move = function(sourceId, destPath) {
           }
         }).then(function(moved) {
           if (moved != 0) {
-            var msg = `Moved id:${sourceId} to new parent:${destParentId}`;
+            msg = `Moved id:${sourceId} to new parent:${destParentId}`;
             console.log(msg);
-            resolve(msg);
+
+            // If we're moving a folder, then we need to update the paths for each of
+            // it's children as well to reflect the new location.
+            if (sourceFileType == 1) {
+
+              // When querying for a string with backslashes, they need to be doubled up,
+              // even if they already look doubled up in anything output to the console.
+              // For example, if we search for C:\\SOME\\PATH then we need to actually look
+              // for C:\\\\SOME\\\\PATH in order for the search to be successful.
+              var pattern = /\\/g;
+              var sqlSearchPath = sourceRootPath.replace(pattern, "\\\\");
+              console.log(`sqlSearchPath: '${sqlSearchPath}'`);
+
+              // Find all records that match the path we're looking for
+              const Op = sequelize.Op;
+              models.Drive.findAll({
+                where: {
+                  path: {
+                    [Op.like]: sqlSearchPath + '%'
+                  }
+                }
+              }).then(function(results) {
+                // Loop through each record and update the path
+                var promises = [];
+                Object.keys(results).forEach(function(key) {
+                  var val = results[key];
+                  var updatedPath = val.path.replace(sourceRootPath, destFullPath);
+                  console.log(`UPDATED PATH: '${updatedPath}'`);
+                  val.updateAttributes({path: updatedPath});
+                });
+
+                resolve("Move completed successfully");
+
+              }).catch(err => {
+                console.log("Error caught: " + err);
+                reject(err);
+              });
+            } else {
+              // File has been successfully moved, so we're done!
+              resolve(msg);
+            }
           } else {
-            var msg = `Failed to move id:${sourceId} to new parent:${destParentId}`;
+            msg = `Failed to move id:${sourceId} to new parent:${destParentId}`;
             console.log(msg);
             reject(msg);
           }
         });
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // TODO: FIX THIS SINCE IT WILL LIKELY RUN **BEFORE** THE PREVIOUS CALL TO models.Drive.update() FINISHES ITS UPDATE  //
-        // (SINCE IT IS NOT PART OF THE CALLBACK) -- OR IS THAT OK SINCE IT'S BASICALLY DELETING IN PARALLEL WITH THE UPDATE? //
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (isFile == 1) {
-          //to be tested with nested folders
-          models.Drive.find({
-            where: {
-              parent_id: sourceId
-            }
-          }).then(function(drive) {
-            exports.move(drive.id, path.join(destFullPath))
-          });
-        }
       });
     });
   });

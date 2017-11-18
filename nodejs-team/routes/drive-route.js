@@ -43,7 +43,7 @@ console.log('here');
         console.log('pathhhhh'+drive.path);
         var isFile = validate.isDirectory(drive.path);
         var mul = drive_sequelize.multiple(key, isFile);
-      
+
         mul.then(drives => {
             res.json(JSON.stringify(drives));
           })
@@ -95,11 +95,6 @@ router.get('/move', function(req, res, next) {
     fs.readdir(filePath, function(err, id, destPath) {
       if (err)
         res.status(404).send({ error: err });
-
-      //////////////////////////////////////////////////////////
-      id = 3; // TODO: Remove this test data! //
-      destPath = 'test path'; // TODO: Remove this test data! //
-      //////////////////////////////////////////////////////////
 
       var p = drive_sequelize.move(id, destPath);
       p.then(fileId => {
