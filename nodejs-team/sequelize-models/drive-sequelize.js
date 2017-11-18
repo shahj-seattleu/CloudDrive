@@ -45,6 +45,15 @@ exports.get_drive = function(id) {
   });
 };
 
+exports.getFilePath = function(id) {
+  console.log("getFilePath" + id);
+  return models.Drive.find({
+    where: {
+      id: id
+    }
+  })
+
+}
 
 exports.list = function(sourceId) {
   return new Promise((resolve, reject) => {
@@ -93,7 +102,7 @@ exports.get_parent = function(id) {
   return new Promise((resolve, reject) => {
     models.Drive.find({
       where: {
-        parent_id: id,
+        id: id,
         fileType: 1
       }
     }).then(function(drive) {
@@ -108,7 +117,7 @@ exports.get_parent = function(id) {
 
 
 exports.multiple = function(id, isFile) {
-  console.log('IsFile'+isFile);
+  console.log('IsFile' + isFile);
 
   var p;
   if (!isFile) {
@@ -144,15 +153,15 @@ exports.multiple = function(id, isFile) {
 
 
 var delete_file = function(id) {
-  console.log("delete with id"+id);
+  console.log("delete with id" + id);
   return new Promise((resolve, reject) => {
-   models.Drive.destroy({
+    models.Drive.destroy({
       where: {
         id: id
       }
     }).then(affectedRows => {
-      console.log('affected'+affectedRows);
-      if (affectedRows==1)
+      console.log('affected' + affectedRows);
+      if (affectedRows == 1)
         resolve(`Deleted Successfully`);
       else {
         reject(`Unable to find a matching Drive model`);
@@ -174,7 +183,6 @@ var getFilePath = function(id) {
 
 
 exports.update_SHA = function(id, sha) {
-  console.log('In update sha'+sha +' with id ='+ id);
   return new Promise((resolve, reject) => {
     models.Drive.update({
       sha_256: sha
@@ -183,7 +191,7 @@ exports.update_SHA = function(id, sha) {
         id: id
       }
     }).then(function(drive) {
-      console.log(drive);
+      console.log(`Return value : ${drive}`);
       if (drive == 0) {
         reject(`Failed to update SHA`);
       } else {
