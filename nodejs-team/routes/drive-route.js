@@ -11,7 +11,7 @@ var validate = require("../validation/validation");
 var sha = require("../sha/sha");
 
 
-rrouter.get('/list', function(req, res, next) {
+router.get('/list', function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-  With, Content-Type, Accept");
   var key = 0;
