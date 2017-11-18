@@ -11,24 +11,35 @@ var validate = require("../validation/validation");
 var sha = require("../sha/sha");
 
 
-router.get('/list', function(req, res, next) {
+rrouter.get('/list', function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-  With, Content-Type, Accept");
   var key = 0;
   if (req.query.path_id) {
     key = req.query.path_id;
   }
-  var p = drive_sequelize.list(key);
-  p.then(drives => {
-      res.json(JSON.stringify(drives));
+  //console.log('in list');
+  //console.log('Keyyyy'+key);
+  //Getting the Folder ID, ASSUMING Key = PID
+  var flag = drive_sequelize.get_childdrive(key);
+  flag.then(drive => {
+      if (drive) {
+       console.log(drive);
+       //console.log('Keyyyyy'+drive.id);
+        var p = drive_sequelize.list(drive.id);
+          p.then(drives => {
+              res.json(JSON.stringify(drives));
+            })
+            .catch(err => {
+              res.status(404).send({ error: err});
+            });
+      }
     })
     .catch(err => {
-      res.status(404).send({
-        error: err
-      });
+          res.status(404).send({ error: err});
     });
-
 });
+
 
 router.get('/sha', function(req, res, next) {
   var key = 0;

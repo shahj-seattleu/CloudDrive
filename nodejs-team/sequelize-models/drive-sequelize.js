@@ -54,7 +54,7 @@ exports.getFilePath = function(id) {
   })
 
 }
-
+/*
 exports.list = function(sourceId) {
   return new Promise((resolve, reject) => {
     var isFile;
@@ -96,6 +96,30 @@ exports.list = function(sourceId) {
     });
   });
 };
+*/
+
+exports.list = function(id) {
+  console.log('id'+id);
+    var x = getFilePath(id);
+    return new Promise((resolve, reject) => {
+    x.then(p_drive => {
+      models.Drive.findAll({
+        where: {
+          parent_id: id
+        }
+      }).then(function(drive) {
+      //  console.log('drrrive'+drive);
+        if(drive){
+            resolve(drive);
+        }else {
+          reject(`Error while find a parent Drive model`);
+        }
+        }).catch(err => {
+          reject(`Error while find a parent Drive model`);
+        });
+      });
+    });
+    };
 
 
 exports.get_parent = function(id) {
