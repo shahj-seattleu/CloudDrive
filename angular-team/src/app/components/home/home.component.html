@@ -72,6 +72,7 @@
                     <p class="card-text">{{folder.path}}</p>
                     <button *ngIf="post.fileType==2" type="button" (click)="onDownload(post)">Download</button>
                     <button class="btn btn-danger btn-small" (click)="onDeleteClick">Delete</button>
+                    <button class="btn btn-success btn-small"(click)="saveFile()">Download</button></div>
                 </div>
             </div>
 

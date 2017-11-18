@@ -1,7 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {DataService} from '../../services/data.service';
 import {NgForm, FormGroupDirective, FormControl} from '@angular/forms';
-
+import {saveAs } from 'file-saver/Filesaver';
+import { Http, Headers } from '@angular/http';
+import 'rxjs/add/operator/toPromise';
 
 interface Folder {
     id: Number,
@@ -11,6 +13,7 @@ interface Folder {
     fileType: Number,
     size: Number
 }
+
 
 interface NewFile {
     id: Number,
@@ -37,13 +40,14 @@ export class HomeComponent implements OnInit {
     private folderPath: string;
     public newFile: NewFile;
     public folder: Folder;
-    public folders: Array<Folder>;
+    public folders: Folder[];
+   
 
-    constructor(private dataservice: DataService) {
+    constructor(private dataservice: DataService, private http:Http ) {
         console.log('Constructor ran...')
 
     }
-
+    
     retrieveFileData(event) {
         if (event.target.files[0]) {
             this.fileName = event.target.files[0].name;
@@ -164,11 +168,27 @@ export class HomeComponent implements OnInit {
             
         });
     }
+    //save file to disk
+    //https://shekhargulati.com/2017/07/16/implementing-file-save-functionality-with-angular-4/
+    saveFile() {
+        console.log('Download cliked: ');
+        const headers = new Headers();
+        headers.append('Accept', 'text/plain');
+        this.http.get('/api/files', {
+            headers:headers
+        }).toPromise()
+        .then(response => this.saveToFileSystem(response));
+    }
 
-    onDownload(folder: Folder) {
-        console.log('onDownload pressed');
+   saveToFileSystem(response){
+        const contentDispositionHeader: string = response.headers.get('Content-Disposition');
+        const parts: string[] = contentDispositionHeader.split(';');
+        const filename = parts[1].split('=')[1];
+        const blob = new Blob([response._body], {type: 'text/plain'});
+
+        saveAs(blob, filename);
+        console.log("file name: " + filename + " saved!");
         
-
     }
 
 
