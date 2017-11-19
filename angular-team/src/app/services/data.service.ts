@@ -27,7 +27,7 @@ export class DataService {
   //   const body = { file_path: data, path_id: 0 };
   //   this.http.post('127.0.0.1:3000/files/add', body, {
   //     headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
-  //   }).subscribe();
+  //   }).subscribe(data => console.log(data));
   //
   // }
   //Has file data for upload to server

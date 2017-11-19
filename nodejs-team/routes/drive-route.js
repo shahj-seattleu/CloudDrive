@@ -204,16 +204,25 @@ router.post('/add', function(req, res, next) {
                     fs.mkdirSync(dest);
 
                   walkSync(src, dest, [], drive);
-                  var parent = drive_sequelize.list(key);
-                  parent.then(drives => {
-                      res.status(200).send(JSON.stringify(drives));
+                  var flag = drive_sequelize.get_childdrive(key);
+                  flag.then(drive => {
+                      if (drive) {
+                        var p = drive_sequelize.list(drive);
+                        p.then(drives => {
+                            res.json(JSON.stringify(drives));
+                          })
+                          .catch(err => {
+                            res.status(404).send({
+                              error: err
+                            });
+                          });
+                      }
                     })
                     .catch(err => {
                       res.status(404).send({
                         error: err
                       });
                     });
-
                 });
 
               })

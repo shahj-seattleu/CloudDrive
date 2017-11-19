@@ -80,6 +80,6 @@ node_modules\.bin\sequelize db:migrate
 npm start
 ```
 
-## Postman Collection url for Web services
+## Postman Collection url and documentation for Web services
 * https://www.getpostman.com/
 * https://www.getpostman.com/collections/99a8ebd8dabe6c57bfee
