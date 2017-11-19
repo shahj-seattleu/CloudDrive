@@ -70,6 +70,9 @@ router.get('/sha', function(req, res, next) {
 
 
 router.post('/delete', function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-  With, Content-Type, Accept");
+
   console.log('here');
   var key = 0;
   if (req.body.path_id != undefined) {
@@ -167,7 +170,7 @@ router.post('/add', function(req, res, next) {
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
 
-  var src = path.join(__dirname, '../drive', '');
+  var src = '';
   var key = 0;
   if (req.body.path_id != undefined) {
     key = req.body.path_id;
