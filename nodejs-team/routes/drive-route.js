@@ -270,77 +270,77 @@ router.post('/add', function(req, res, next) {
     fs.access(dest, (err) => {
       if (err)
         fs.mkdirSync(dest);
-    if (key != 0) {
-      var root = drive_sequelize.get_parent(key);
-      root.then(p_drive => {
-          var file_name = src.replace(/^.*[\\\/]/, '');
-          dest = path.join(p_drive.path, file_name, '');
-          var s_parent = drive_sequelize.create(p_drive.id, file_name, dest, 2, 0);
-          s_parent.then(drive => {
-              var sha_ret = copyFile(src, dest);
-              sha_ret.then(sha_data => {
-                  var update_sha = drive_sequelize.update_SHA(drive.id, sha_data);
-                  update_sha.then(status => {
-                      console.log(status);
-                      res.status(200).send(JSON.stringify(drive));
-                    })
-                    .catch(err => {
-                      res.status(404).send({
-                        error: err
+      if (key != 0) {
+        var root = drive_sequelize.get_parent(key);
+        root.then(p_drive => {
+            var file_name = src.replace(/^.*[\\\/]/, '');
+            dest = path.join(p_drive.path, file_name, '');
+            var s_parent = drive_sequelize.create(p_drive.id, file_name, dest, 2, 0);
+            s_parent.then(drive => {
+                var sha_ret = copyFile(src, dest);
+                sha_ret.then(sha_data => {
+                    var update_sha = drive_sequelize.update_SHA(drive.id, sha_data);
+                    update_sha.then(status => {
+                        console.log(status);
+                        res.status(200).send(JSON.stringify(drive));
+                      })
+                      .catch(err => {
+                        res.status(404).send({
+                          error: err
+                        });
                       });
+                  })
+                  .catch(err => {
+                    res.status(404).send({
+                      error: err
                     });
-                })
-                .catch(err => {
-                  res.status(404).send({
-                    error: err
                   });
+              })
+              .catch(err => {
+                res.status(404).send({
+                  error: err
                 });
-            })
-            .catch(err => {
-              res.status(404).send({
-                error: err
               });
+
+
+          })
+          .catch(err => {
+            res.status(404).send({
+              error: err
             });
-
-
-        })
-        .catch(err => {
-          res.status(404).send({
-            error: err
           });
-        });
 
-    } else {
-      var file_name = src.replace(/^.*[\\\/]/, '');
-      dest = path.join(dest, file_name, '');
-      var s_parent = drive_sequelize.create(0, file_name, dest, 2, 0);
-      s_parent.then(drive => {
-          var sha_ret = copyFile(src, dest);
-          sha_ret.then(sha_data => {
-              var update_sha = drive_sequelize.update_SHA(drive.id, sha_data);
-              update_sha.then(status => {
-                  console.log(status);
-                  res.status(200).send(JSON.stringify(drive));
-                })
-                .catch(err => {
-                  res.status(404).send({
-                    error: err
+      } else {
+        var file_name = src.replace(/^.*[\\\/]/, '');
+        dest = path.join(dest, file_name, '');
+        var s_parent = drive_sequelize.create(0, file_name, dest, 2, 0);
+        s_parent.then(drive => {
+            var sha_ret = copyFile(src, dest);
+            sha_ret.then(sha_data => {
+                var update_sha = drive_sequelize.update_SHA(drive.id, sha_data);
+                update_sha.then(status => {
+                    console.log(status);
+                    res.status(200).send(JSON.stringify(drive));
+                  })
+                  .catch(err => {
+                    res.status(404).send({
+                      error: err
+                    });
                   });
+              })
+              .catch(err => {
+                res.status(404).send({
+                  error: err
                 });
-            })
-            .catch(err => {
-              res.status(404).send({
-                error: err
               });
+          })
+          .catch(err => {
+            res.status(404).send({
+              error: err
             });
-        })
-        .catch(err => {
-          res.status(404).send({
-            error: err
           });
-        });
 
-    }
+      }
     });
   }
 
