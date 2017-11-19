@@ -18,8 +18,8 @@ router.get('/list', function(req, res, next) {
   if (req.query.path_id) {
     key = req.query.path_id;
   }
-  //console.log('in list');
-  //console.log('Keyyyy'+key);
+  console.log('in list');
+  console.log('Keyyyy'+key);
   //Getting the Folder ID, ASSUMING Key = PID
   var flag = drive_sequelize.get_childdrive(key);
   flag.then(drive => {
@@ -69,7 +69,7 @@ router.get('/sha', function(req, res, next) {
 });
 
 
-router.get('/delete', function(req, res, next) {
+router.post('/delete', function(req, res, next) {
   console.log('here');
   var key = 0;
   if (req.body.path_id != undefined) {
@@ -129,18 +129,20 @@ router.post('/download', function(req, res, next) {
 });
 
 
-router.get('/move', function(req, res, next) {
+router.post('/move', function(req, res, next) {
   console.log("router move");
-  var filePath = path.join(__dirname, '../drive', '');
+  var filePath = '';
+  if (req.body.file_path != undefined) {
+    filePath = req.body.file_path;
+  }
+  var path_id = 0;
+  if (req.body.path_id != undefined) {
+    path_id = req.body.path_id;
+  }
+
   var result = validate.check_validation(filePath);
   if (result) {
-    fs.readdir(filePath, function(err, id, destPath) {
-      if (err)
-        res.status(404).send({
-          error: err
-        });
-
-      var p = drive_sequelize.move(id, destPath);
+      var p = drive_sequelize.move(path_id, filePath);
       p.then(fileId => {
           res.json(JSON.stringify(p));
         })
@@ -149,7 +151,7 @@ router.get('/move', function(req, res, next) {
             error: err
           });
         });
-    });
+
   } else {
     res.status(404).send({
       error: "Can't Move.No File Found"
