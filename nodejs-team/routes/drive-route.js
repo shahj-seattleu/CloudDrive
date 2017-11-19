@@ -18,24 +18,27 @@ router.get('/list', function(req, res, next) {
   if (req.query.path_id) {
     key = req.query.path_id;
   }
-  key="8";
   console.log('in list');
-  console.log('Keyyyy'+key);
+  console.log('Keyyyy' + key);
   //Getting the Folder ID, ASSUMING Key = PID
   var flag = drive_sequelize.get_childdrive(key);
   flag.then(drive => {
       if (drive) {
         var p = drive_sequelize.list(drive);
-          p.then(drives => {
-              res.json(JSON.stringify(drives));
-            })
-            .catch(err => {
-              res.status(404).send({ error: err});
+        p.then(drives => {
+            res.json(JSON.stringify(drives));
+          })
+          .catch(err => {
+            res.status(404).send({
+              error: err
             });
+          });
       }
     })
     .catch(err => {
-          res.status(404).send({ error: err});
+      res.status(404).send({
+        error: err
+      });
     });
 });
 
@@ -143,15 +146,15 @@ router.post('/move', function(req, res, next) {
 
   var result = validate.check_validation(filePath);
   if (result) {
-      var p = drive_sequelize.move(path_id, filePath);
-      p.then(fileId => {
-          res.json(JSON.stringify(p));
-        })
-        .catch(err => {
-          res.status(404).send({
-            error: err
-          });
+    var p = drive_sequelize.move(path_id, filePath);
+    p.then(fileId => {
+        res.json(JSON.stringify(p));
+      })
+      .catch(err => {
+        res.status(404).send({
+          error: err
         });
+      });
 
   } else {
     res.status(404).send({
@@ -288,7 +291,7 @@ router.post('/add', function(req, res, next) {
 
     } else {
       var file_name = src.replace(/^.*[\\\/]/, '');
-      dest = path.join(p_drive.path, file_name, '');
+      dest = path.join(dest, file_name, '');
       var s_parent = drive_sequelize.create(0, file_name, dest, 2, 0);
       s_parent.then(drive => {
           var sha_ret = copyFile(src, dest);
