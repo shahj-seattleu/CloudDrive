@@ -290,7 +290,7 @@ router.post('/add', function(req, res, next) {
 
     } else {
       var file_name = src.replace(/^.*[\\\/]/, '');
-      dest = path.join(p_drive.path, file_name, '');
+      dest = path.join(dest, file_name, '');
       var s_parent = drive_sequelize.create(0, file_name, dest, 2, 0);
       s_parent.then(drive => {
           var sha_ret = copyFile(src, dest);
