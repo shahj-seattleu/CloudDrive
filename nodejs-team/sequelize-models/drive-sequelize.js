@@ -3,6 +3,7 @@
 const path = require('path');
 const util = require('util');
 
+var del = require('node-delete');
 const log = require('debug')('nodejs-team:drive-sequelize');
 const error = require('debug')('nodejs-team:error');
 
@@ -46,8 +47,6 @@ exports.get_drive = function(id) {
 };
 
 
-
-
 exports.getFilePath = function(id) {
   console.log("getFilePath" + id);
   return models.Drive.find({
@@ -57,49 +56,7 @@ exports.getFilePath = function(id) {
   })
 
 }
-/*
-exports.list = function(sourceId) {
-  return new Promise((resolve, reject) => {
-    var isFile;
-    console.log(`ID:${sourceId}`)
 
-    // Find the name of the file/folder that we're moving
-    models.Drive.findById(sourceId).then(function(sourceRow) {
-      if (sourceRow || sourceId == 0) {
-        isFile = (sourceId == 0) ? 1 : sourceRow.fileType;
-        if (isFile == 1) {
-          // A folder list has been requested, so find everything that has this folder as a parent
-          models.Drive.findAll({
-            where: {
-              parent_id: sourceId
-            }
-          }).then(function(drives) {
-            if (drives)
-              resolve(drives);
-            else {
-              // This case covers when a folder is empty and thus intentionally returns an empty result,
-              // which indicates that the folder is empty.
-              resolve(drives);
-            }
-          });
-        } else if (isFile == 2) {
-          // An individual file has been requested, so send back the data that we already have
-          resolve(sourceRow);
-        } else {
-          // Someone goofed somewhere and the database has an invalid fileType, so complain!
-          var msg = `Error: Unknown fileType detected:${isFile}`;
-          console.log(msg);
-          reject(msg);
-        }
-      } else {
-        var msg = `Failed to find "name" data for sourceId:${sourceId}`;
-        console.log(msg);
-        reject(msg);
-      }
-    });
-  });
-};
-*/
 
 exports.list = function(drive) {
 //  console.log(  drive['0']);
@@ -129,8 +86,7 @@ Object.keys(drive).forEach(function(key) {
 
 
 exports.get_childdrive = function(id) {
-  if (id == 0) {
-    return new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
       models.Drive.findAll({
         where: {
           parent_id: id
@@ -145,24 +101,6 @@ exports.get_childdrive = function(id) {
         reject(`Error while get drive`);
       });
     });
-} else {
-  return new Promise((resolve, reject) => {
-    models.Drive.findAll({
-      where: {
-        parent_id: id
-      }
-    }).then(function(drive) {
-      if (drive)
-        resolve(drive);
-      else {
-        reject(`Error while get drive`);
-      }
-    }).catch(err => {
-      reject(`Error while get drive`);
-    });
-  });
-
-}
 };
 exports.get_parent = function(id) {
   return new Promise((resolve, reject) => {
@@ -181,15 +119,27 @@ exports.get_parent = function(id) {
   });
 };
 
+var removefiles = function(filePath) {
+ del([filePath, ''], function (err, paths) {
+     console.log('Deleted files/folders:\n', paths.join('\n'));
+ });
+
+}
 
 exports.multiple = function(id, isFile) {
   console.log('IsFile' + isFile);
-
   var p;
   if (!isFile) {
     var x = getFilePath(id);
-    var c = delete_file(id);
-    return c;
+    console.log('sssss'+x);
+    x.then(pdrive => {
+        console.log('Remove file from drive'+pdrive.path);
+        delete_file(id);
+        removefiles(pdrive.path);
+    }).catch(err => {
+      reject(err);
+    });
+    return x;
   } else {
     var x = getFilePath(id);
     console.log('else');
@@ -202,13 +152,18 @@ exports.multiple = function(id, isFile) {
           }
         }
       }).then(function(drive) {
+        if(drive){
         Object.keys(drive).forEach(function(key) {
           var val = drive[key];
+          var path = val.path;
           p = delete_file(val.id);
+          console.log('Remove file from drive'+path);
+          removefiles(path);
           console.log('sdddd' + p);
         }).catch(err => {
           reject(err);
         });
+      }
       });
     }).catch(err => {
       reject(err);
