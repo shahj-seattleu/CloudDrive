@@ -5,14 +5,13 @@ const util = require('util');
 
 const log = require('debug')('nodejs-team:drive-sequelize');
 const error = require('debug')('nodejs-team:error');
-const fsx = require("fs-extra");
 
 var models = require('../models/index');
 var Drive = require('../models/drive');
 var sequelize = require('sequelize');
 
 
-exports.create = function (id, name, path, type, size) {
+exports.create = function(id, name, path, type, size) {
   return new Promise((resolve, reject) => {
     models.Drive.create({
       parent_id: id,
@@ -20,7 +19,7 @@ exports.create = function (id, name, path, type, size) {
       path: path,
       fileType: type,
       size: size
-    }).then(function (drive) {
+    }).then(function(drive) {
       if (drive)
         resolve(drive);
       else {
@@ -30,13 +29,13 @@ exports.create = function (id, name, path, type, size) {
   });
 };
 
-exports.get_drive = function (id) {
+exports.get_drive = function(id) {
   return new Promise((resolve, reject) => {
     models.Drive.find({
       where: {
         id: id
       }
-    }).then(function (drive) {
+    }).then(function(drive) {
       if (drive)
         resolve(drive);
       else {
@@ -46,7 +45,10 @@ exports.get_drive = function (id) {
   });
 };
 
-exports.getFilePath = function (id) {
+
+
+
+exports.getFilePath = function(id) {
   console.log("getFilePath" + id);
   return models.Drive.find({
     where: {
@@ -99,74 +101,77 @@ exports.list = function(sourceId) {
 };
 */
 
-exports.list = function (id) {
-  console.log('id' + id);
-  var x = getFilePath(id);
-  return new Promise((resolve, reject) => {
-    x.then(p_drive => {
+exports.list = function(drive) {
+//  console.log(  drive['0']);
+var num=[];
+Object.keys(drive).forEach(function(key) {
+  var val = drive[key];
+  var id = val.id;
+  num.push(id);
+});
+    console.log('num'+num);
+    return new Promise((resolve, reject) => {
+      models.Drive.findAll({
+        where: {
+          parent_id:num
+        }
+      }).then(function(drive) {
+        if (drive)
+          resolve(drive);
+        else {
+          reject(`Error while get drive`);
+        }
+      }).catch(err => {
+        reject(`Error while get drive`);
+      });
+    });
+};
+
+
+exports.get_childdrive = function(id) {
+  if (id == 0) {
+    return new Promise((resolve, reject) => {
       models.Drive.findAll({
         where: {
           parent_id: id
         }
-      }).then(function (drive) {
-        //  console.log('drrrive'+drive);
-        if (drive) {
+      }).then(function(drive) {
+        if (drive)
           resolve(drive);
-        } else {
-          reject(`Error while find a parent Drive model`);
+        else {
+          reject(`Error while get drive`);
         }
       }).catch(err => {
-        reject(`Error while find a parent Drive model`);
+        reject(`Error while get drive`);
       });
+    });
+} else {
+  return new Promise((resolve, reject) => {
+    models.Drive.findAll({
+      where: {
+        id: id
+      }
+    }).then(function(drive) {
+      if (drive)
+        resolve(drive);
+      else {
+        reject(`Error while get drive`);
+      }
+    }).catch(err => {
+      reject(`Error while get drive`);
     });
   });
+
+}
 };
-
-exports.get_childdrive = function (id) {
-  if (id == 0) {
-    return new Promise((resolve, reject) => {
-      models.Drive.find({
-
-        where: {
-          parent_id: id
-        }
-      }).then(function (drive) {
-        if (drive)
-          resolve(drive);
-        else {
-          reject(`Error while get drive`);
-        }
-      }).catch(err => {
-        reject(`Error while get drive`);
-      });
-    });
-  } else {
-    return new Promise((resolve, reject) => {
-      models.Drive.find({
-        where: {
-          id: id
-        }
-      }).then(function (drive) {
-        if (drive)
-          resolve(drive);
-        else {
-          reject(`Error while get drive`);
-        }
-      }).catch(err => {
-        reject(`Error while get drive`);
-      });
-    });
-
-  }
-};
-exports.get_parent = function (id) {
+exports.get_parent = function(id) {
   return new Promise((resolve, reject) => {
     models.Drive.find({
       where: {
         id: id,
         fileType: 1
       }
-    }).then(function (drive) {
+    }).then(function(drive) {
       if (drive)
         resolve(drive);
       else {
@@ -177,7 +182,7 @@ exports.get_parent = function (id) {
 };
 
 
-exports.multiple = function (id, isFile) {
+exports.multiple = function(id, isFile) {
   console.log('IsFile' + isFile);
 
   var p;
@@ -195,8 +200,8 @@ exports.multiple = function (id, isFile) {
             [Op.like]: p_drive.dataValues.path + '%'
           }
         }
-      }).then(function (drive) {
-        Object.keys(drive).forEach(function (key) {
+      }).then(function(drive) {
+        Object.keys(drive).forEach(function(key) {
           var val = drive[key];
           p = delete_file(val.id);
           console.log('sdddd' + p);
@@ -213,7 +218,7 @@ exports.multiple = function (id, isFile) {
 };
 
 
-var delete_file = function (id) {
+var delete_file = function(id) {
   console.log("delete with id" + id);
   return new Promise((resolve, reject) => {
     models.Drive.destroy({
@@ -233,7 +238,7 @@ var delete_file = function (id) {
 };
 
 
-var getFilePath = function (id) {
+var getFilePath = function(id) {
   console.log("getFilePath" + id);
   return models.Drive.find({
     where: {
@@ -243,27 +248,27 @@ var getFilePath = function (id) {
 };
 
 
-exports.update_SHA = function (id, sha) {
+exports.update_SHA = function(id, sha) {
   return new Promise((resolve, reject) => {
     models.Drive.update({
       sha_256: sha
     }, {
-        where: {
-          id: id
-        }
-      }).then(function (drive) {
-        console.log(`Return value : ${drive}`);
-        if (drive == 0) {
-          reject(`Failed to update SHA`);
-        } else {
-          resolve(`Updated successfully`);
-        }
-      });
+      where: {
+        id: id
+      }
+    }).then(function(drive) {
+      console.log(`Return value : ${drive}`);
+      if (drive == 0) {
+        reject(`Failed to update SHA`);
+      } else {
+        resolve(`Updated successfully`);
+      }
+    });
   });
 };
 
 
-exports.move = function (sourceId, destPath) {
+exports.move = function(sourceId, destPath) {
   console.log(`sourceId:${sourceId}  destPath:${destPath}`)
 
   return new Promise((resolve, reject) => {
@@ -288,7 +293,7 @@ exports.move = function (sourceId, destPath) {
     }
 
     // Find the name of the source file/folder that we're moving
-    models.Drive.findById(sourceId).then(function (sourceRow) {
+    models.Drive.findById(sourceId).then(function(sourceRow) {
       if (sourceRow) {
         destFileName = sourceRow.name;
         sourceFileType = sourceRow.fileType;
@@ -309,7 +314,7 @@ exports.move = function (sourceId, destPath) {
         where: {
           path: destSearchPath
         }
-      }).then(function (destRow) {
+      }).then(function(destRow) {
         if (destRow) {
           // Found the path specified, use it's ID as the new parentId
           destParentId = destRow.id;
@@ -360,75 +365,60 @@ exports.move = function (sourceId, destPath) {
           parent_id: destParentId,
           path: destFullPath
         }, {
-            where: {
-              id: sourceId
-            }
-          }).then(function (moved) {
-            if (moved != 0) {
-              msg = `Moved id:${sourceId} to new parent:${destParentId}`;
-              console.log(msg);
+          where: {
+            id: sourceId
+          }
+        }).then(function(moved) {
+          if (moved != 0) {
+            msg = `Moved id:${sourceId} to new parent:${destParentId}`;
+            console.log(msg);
 
-              // If we're moving a folder, then we need to update the paths for each of
-              // it's children as well to reflect the new location.
-              if (sourceFileType == 1) {
+            // If we're moving a folder, then we need to update the paths for each of
+            // it's children as well to reflect the new location.
+            if (sourceFileType == 1) {
 
-                // When querying for a string with backslashes, they need to be doubled up,
-                // even if they already look doubled up in anything output to the console.
-                // For example, if we search for C:\\SOME\\PATH then we need to actually look
-                // for C:\\\\SOME\\\\PATH in order for the search to be successful.
-                var pattern = /\\/g;
-                var sqlSearchPath = sourceRootPath.replace(pattern, "\\\\");
-                console.log(`sqlSearchPath: '${sqlSearchPath}'`);
+              // When querying for a string with backslashes, they need to be doubled up,
+              // even if they already look doubled up in anything output to the console.
+              // For example, if we search for C:\\SOME\\PATH then we need to actually look
+              // for C:\\\\SOME\\\\PATH in order for the search to be successful.
+              var pattern = /\\/g;
+              var sqlSearchPath = sourceRootPath.replace(pattern, "\\\\");
+              console.log(`sqlSearchPath: '${sqlSearchPath}'`);
 
-                // Find all records that match the path we're looking for
-                const Op = sequelize.Op;
-                models.Drive.findAll({
-                  where: {
-                    path: {
-                      [Op.like]: sqlSearchPath + '%'
-                    }
+              // Find all records that match the path we're looking for
+              const Op = sequelize.Op;
+              models.Drive.findAll({
+                where: {
+                  path: {
+                    [Op.like]: sqlSearchPath + '%'
                   }
-                }).then(function (results) {
-                  // Loop through each record and update the path
-                  var promises = [];
-                  Object.keys(results).forEach(function (key) {
-                    var val = results[key];
-                    var updatedPath = val.path.replace(sourceRootPath, destFullPath);
-                    console.log(`UPDATED PATH: '${updatedPath}'`);
-                    val.updateAttributes({ path: updatedPath });
-                  });
+                }
+              }).then(function(results) {
+                // Loop through each record and update the path
+                var promises = [];
+                Object.keys(results).forEach(function(key) {
+                  var val = results[key];
+                  var updatedPath = val.path.replace(sourceRootPath, destFullPath);
+                  console.log(`UPDATED PATH: '${updatedPath}'`);
+                  val.updateAttributes({path: updatedPath});
+                });
 
-                  // Now move the actual folder on the server
-                  fsx.move(sourceRootPath, destFullPath, function (err) {
-                    if (err) {
-                      console.log(err);
-                      reject(err);
-                    } else {
-                      resolve("Move completed successfully");
-                    }
-                  });
-                }).catch(err => {
-                  console.log("Error caught: " + err);
-                  reject(err);
-                });
-              } else {
-                // Now move the actual file on the server
-                fsx.move(sourceRootPath, destFullPath, function (err) {
-                  if (err) {
-                    console.log(err);
-                    reject(err);
-                  } else {
-                    // File has been successfully moved, so we're done!
-                    resolve(msg);
-                  }
-                });
-              }
+                resolve("Move completed successfully");
+
+              }).catch(err => {
+                console.log("Error caught: " + err);
+                reject(err);
+              });
             } else {
-              msg = `Failed to move id:${sourceId} to new parent:${destParentId}`;
-              console.log(msg);
-              reject(msg);
+              // File has been successfully moved, so we're done!
+              resolve(msg);
             }
-          });
+          } else {
+            msg = `Failed to move id:${sourceId} to new parent:${destParentId}`;
+            console.log(msg);
+            reject(msg);
+          }
+        });
       });
     });
   });
