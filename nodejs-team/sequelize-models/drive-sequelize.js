@@ -39,7 +39,7 @@ exports.get_drive = function(id) {
       if (drive)
         resolve(drive);
       else {
-        reject(`Error while get drive`);
+        reject(`File not Found `);
       }
     });
   });
@@ -113,7 +113,7 @@ Object.keys(drive).forEach(function(key) {
     return new Promise((resolve, reject) => {
       models.Drive.findAll({
         where: {
-          parent_id:num
+          id:num
         }
       }).then(function(drive) {
         if (drive)
@@ -149,7 +149,7 @@ exports.get_childdrive = function(id) {
   return new Promise((resolve, reject) => {
     models.Drive.findAll({
       where: {
-        id: id
+        parent_id: id
       }
     }).then(function(drive) {
       if (drive)
@@ -187,6 +187,7 @@ exports.multiple = function(id, isFile) {
 
   var p;
   if (!isFile) {
+    var x = getFilePath(id);
     var c = delete_file(id);
     return c;
   } else {
