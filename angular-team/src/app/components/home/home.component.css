@@ -88,3 +88,7 @@ footer p {
     color: #4054B2;
     border: 1px solid #4054B2;
 }
+
+.notShow{
+    display:none;
+    }

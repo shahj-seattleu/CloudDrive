@@ -30,7 +30,6 @@ export class DataService {
       });
   }
 
-
     public url: any = {
         postFileUrl: "http://127.0.0.1:3000/files/add",
         postFolderUrl: "http://127.0.0.1:3000/files/add",
@@ -45,11 +44,16 @@ export class DataService {
         return this.http.post(this.url.postFolderUrl, data).map((res: any) => res.json());
     }
      //Has folder id for delete from server
-     deleteFolder(request) {
-        console.log("post folder data: " + request);
-        console.log("Nitish post folder data path id: "+request.path_id);
+     deleteFolder(id) {
+        let body = `path_id=${id}`;
+        var headers = new Headers();
+        headers.append('Content-Type', 'application/x-www-form-urlencoded');
+        console.log("in delete: " + body);
+        // console.log("Nitish post folder data path id: "+request.path_id);
 
-        return this.http.post(this.url.deleteFileUrl, request).map((res: any) => res.json());
+        return this.http.post(this.url.deleteFileUrl, body, {
+            headers: headers
+          }).map((res: any) => res.json());
     }
     //get folder from server
     //needs to get folder by id
@@ -88,10 +92,12 @@ export class DataService {
 
     saveFile(id) {
         console.log('Download cliked data service: ' + id);
-        const headers = new Headers();
-        headers.append('Accept', 'text/plain');
+        let body = `path_id=${id}`;
+        var headers = new Headers();
+        console.log("in download body : ", body);
+        headers.append('Content-Type', 'application/x-www-form-urlencoded');
         console.log('Download Link data service -->'+this.url.downloadFileUrl);
-        this.http.get(this.url.downloadFileUrl, {
+        this.http.post(this.url.downloadFileUrl, {
             headers:headers
         }).toPromise()
         .then(response => this.saveToFileSystem(response));
