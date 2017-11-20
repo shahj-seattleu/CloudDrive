@@ -31,7 +31,7 @@ interface NewFile {
     styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
-
+    
     private fileName: string = 'Select a file';
     private folderName: string = 'Select a folder';
     private fileSize: number;
@@ -42,7 +42,7 @@ export class HomeComponent implements OnInit {
     public folder: Folder;
     public folders: Folder[];
     public parentid: Number;
-
+    
     constructor(private dataservice: DataService, private http:Http ) {
         console.log('Constructor ran...')
 
@@ -60,11 +60,13 @@ export class HomeComponent implements OnInit {
         if (event.target.files[0]) {
             this.fileName = event.target.files[0].name;
             this.fileSize = event.target.files[0].size;
+            // this.filePath = event.target.files[0].mozFullPath;
             this.filePath = URL.createObjectURL(event.target.files[0]);
             var reader = new FileReader();
             reader.onload = (loadEvent: any = {}) => {
                 // this.newFile.path = this.filePath;
                 this.newFile.path_id=0;
+                // this.newFile.file_path = this.filePath;
                 this.newFile.file_path = "C:/Users/Nitish/Desktop/Allfolders/testforclouddrive.docx";
                 // this.newFile.name = this.fileName;
                 // this.newFile.fileType = 0;
@@ -170,48 +172,7 @@ export class HomeComponent implements OnInit {
     };
 //Should get id and make a JSON with only path_id to let service delete file sonly with that id
     onDeleteClick(id,filetype):void{
-          this.newFile.path_id=id;
-          this.newFile.file_path = "";
-          this.newFile.name = "";
-          this.newFile.fileType = null;
-          this.newFile.size = null;
-          console.log(this.newFile);
-          console.log("filetype->"+filetype);
-     function removeEmpty(obj) {
-        Object.keys(obj).forEach(function (key) {
-            (obj[key] && typeof obj[key] === 'object') &&
-            removeEmpty(obj[key]) || (obj[key] === '' || obj[key] === null) &&
-            delete obj[key]
-        });
-        return obj;
-    }
-
-    // let payload1 = JSON.stringify(removeEmpty(this.newFile));
-    // let payload2 = JSON.stringify(removeEmpty(this.folder));
-
-    const request ={path_id: id};
-    // let request = JSON.stringify(removeEmpty(payLoad)) ;
-
-    console.log("this is payload:" , request);
-
-    this.dataservice.deleteFolder(request)
-        .subscribe(
-            (res: any) => {
-                console.log("file upload successful:", res);
-            },
-            (error: any) => {
-                console.log("thrown error", error);
-            }
-        );
-    this.dataservice.deleteFolder(request)
-        .subscribe(
-            (res: any) => {
-                console.log("folder upload successful:", res);
-            },
-            (error: any) => {
-                console.log("thrown error", error);
-            }
-        )
+        this.dataservice.deleteFolder(id);
 };
 
 
@@ -265,6 +226,7 @@ export class HomeComponent implements OnInit {
     onFolderClick(id){
         console.log("opening ..." + id);
         this.parentid = id-1;
+        
         // this.dataservice.getFolder(id);
         this.dataservice.getFolder(id).subscribe((folder) => {
 
