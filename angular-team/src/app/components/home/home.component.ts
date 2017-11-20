@@ -6,20 +6,20 @@ import { Http, Headers } from '@angular/http';
 import 'rxjs/add/operator/toPromise';
 
 interface Folder {
-    id: Number,
+    path_id: Number,
     parent_id: Number,
     name: String,
-    path: String,
+    file_path: String,
     fileType: Number,
     size: Number
 }
 
 
 interface NewFile {
-    id: Number,
+    path_id: Number,
     parent_id: Number,
     name: String,
-    path: String,
+    file_path: String,
     fileType: Number,
     size: Number
 }
@@ -41,11 +41,19 @@ export class HomeComponent implements OnInit {
     public newFile: NewFile;
     public folder: Folder;
     public folders: Folder[];
-   
+    public parentid: Number;
 
     constructor(private dataservice: DataService, private http:Http ) {
         console.log('Constructor ran...')
 
+        this.parentid=0;
+    }
+
+
+    removeFileData(id) {
+        
+                this.newFile.path_id=id;
+        
     }
     
     retrieveFileData(event) {
@@ -55,16 +63,18 @@ export class HomeComponent implements OnInit {
             this.filePath = URL.createObjectURL(event.target.files[0]);
             var reader = new FileReader();
             reader.onload = (loadEvent: any = {}) => {
-                this.newFile.path = this.filePath;
-                this.newFile.name = this.fileName;
-                this.newFile.fileType = 0;
-                this.newFile.size = this.fileSize;
+                // this.newFile.path = this.filePath;
+                this.newFile.path_id=0;
+                this.newFile.file_path = "C:/Users/Nitish/Desktop/Allfolders/testforclouddrive.docx";
+                // this.newFile.name = this.fileName;
+                // this.newFile.fileType = 0;
+                // this.newFile.size = this.fileSize;
                 console.log(this.newFile);
             };
             reader.readAsDataURL(event.target.files[0]);
         } else {
             this.fileName = 'Select a file';
-            this.newFile.path = '';
+            this.newFile.file_path = '';
         }
     }
 
@@ -72,53 +82,54 @@ export class HomeComponent implements OnInit {
         if (event.target.files) {
             this.folderName = '1 folder selected';
             this.folderPath = URL.createObjectURL(event.target.files[0]);
-            this.folder.path = this.folderPath;
+            this.folder.file_path = this.folderPath;
             this.folder.name = this.folderName;
             this.folder.fileType = 1;
-            console.log(this.folder.path);
+            console.log(this.folder.file_path);
         } else {
             this.fileName = 'Select a file';
-            this.folder.path = '';
+            this.folder.file_path = '';
         }
     }
 
     ngOnInit() {
         console.log('ngOnInit ran successfuly ...');
         this.dataservice.getFiles().subscribe((folder) => {
-            // console.log(JSON.parse(posts));
+            
 
-            this.folder = JSON.parse(folder);
+            this.folders = JSON.parse(folder);
+            console.log(this.folders);
         });
 
         this.newFile = {
-            id: null,
+            path_id: null,
             parent_id: null,
             name: '',
-            path: '',
+            file_path: '',
             fileType: null,
             size: null
         }
         this.folder = {
-            id: null,
+            path_id: null,
             parent_id: null,
             name: '',
-            path: '',
+            file_path: '',
             fileType: null,
             size: null
         }
 
     }
-    //needs a rethink
-    onClickFolder(folder: Folder) {
-        console.log("folder was clicked successfully");
-        this.dataservice.getFile(this.folder.id).subscribe((folders) => {
-            // console.log(JSON.parse(posts));
+    // //needs a rethink
+    // onClickFolder(folder: Folder) {
+    //     console.log("folder was clicked successfully" + folder.name);
+    //     this.dataservice.getFile(this.folder.path_id).subscribe((folders) => {
+    //         // console.log(JSON.parse(posts));
 
 
-            this.folder = JSON.parse(folders);
-        });
+    //         this.folder = JSON.parse(folders);
+    //     });
 
-    };
+    // };
 
     onClickUpload(): void {
 
@@ -155,41 +166,117 @@ export class HomeComponent implements OnInit {
                 }
             )
     };
-
-    onFileDeleteClick(id) {
-        console.log("deleting " + id);
-        this.dataservice.deleteFile(id).subscribe(res => {
-            console.log(res);
-            for(let i = 0; i < this.folders.length; i++){
-                if(this.folders[i].id == id){
-                    this.folders.splice(i,1);
-                }
-            }
-            
+//Should get id and make a JSON with only path_id to let service delete file sonly with that id
+    onDeleteClick(id,filetype):void{
+          this.newFile.path_id=id;
+          this.newFile.file_path = "";
+          this.newFile.name = "";
+          this.newFile.fileType = null;
+          this.newFile.size = null;
+          console.log(this.newFile);
+          console.log("filetype->"+filetype);
+     function removeEmpty(obj) {
+        Object.keys(obj).forEach(function (key) {
+            (obj[key] && typeof obj[key] === 'object') &&
+            removeEmpty(obj[key]) || (obj[key] === '' || obj[key] === null) &&
+            delete obj[key]
         });
-    }
-    //save file to disk
-    //https://shekhargulati.com/2017/07/16/implementing-file-save-functionality-with-angular-4/
-    saveFile() {
-        console.log('Download cliked: ');
-        const headers = new Headers();
-        headers.append('Accept', 'text/plain');
-        this.http.get('/api/files', {
-            headers:headers
-        }).toPromise()
-        .then(response => this.saveToFileSystem(response));
+        return obj;
     }
 
-   saveToFileSystem(response){
-        const contentDispositionHeader: string = response.headers.get('Content-Disposition');
-        const parts: string[] = contentDispositionHeader.split(';');
-        const filename = parts[1].split('=')[1];
-        const blob = new Blob([response._body], {type: 'text/plain'});
+    // let payload1 = JSON.stringify(removeEmpty(this.newFile));
+    // let payload2 = JSON.stringify(removeEmpty(this.folder));
 
-        saveAs(blob, filename);
-        console.log("file name: " + filename + " saved!");
+    const request ={path_id: id};
+    // let request = JSON.stringify(removeEmpty(payLoad)) ;
+    
+    console.log("this is payload:" , request);
+
+    this.dataservice.deleteFolder(request)
+        .subscribe(
+            (res: any) => {
+                console.log("file upload successful:", res);
+            },
+            (error: any) => {
+                console.log("thrown error", error);
+            }
+        );
+    this.dataservice.deleteFolder(request)
+        .subscribe(
+            (res: any) => {
+                console.log("folder upload successful:", res);
+            },
+            (error: any) => {
+                console.log("thrown error", error);
+            }
+        )
+};
+            
+        
+        // console.log("delete button clicked");
+        
+        // console.log("deleting " + newFile);
+        // this.dataservice.deleteFile(newFile).subscribe(res => {
+        //     console.log(res);
+        //     for(let i = 0; i < this.folders.length; i++){
+        //         if(this.folders[i].path_id == newFile){
+        //             this.folders.splice(i,1);
+        //         }
+        //     }
+            
+        // });
+    // }
+
+    // save file to disk
+    downloadFile(id){
+        console.log("downloading ..." + id);
+        this.dataservice.saveFile(id);
         
     }
 
 
+ //       let res = this.dataservice.saveFile(payload2)
+//       this.dataservice.saveFile(payload1)
+//           .subscribe(
+//               (res: any) => {
+//                   console.log("file upload successful:", res);
+//               },
+//               (error: any) => {
+//                   console.log("thrown error", error);
+//               }
+              
+//           );
+//       let res2 = this.dataservice.saveFile(payload2)
+//           .subscribe(
+//               (res: any) => {
+//                   console.log("folder upload successful:", res);
+//               },
+//               (error: any) => {
+//                   console.log("thrown error", error);
+//               }
+//           )
+//           this.dataservice.saveToFileSystem(res);
+//   };
+            
+    
+
+    onFolderClick(id){
+        console.log("opening ..." + id);
+        this.parentid = id-1;
+        // this.dataservice.getFolder(id);
+        this.dataservice.getFolder(id).subscribe((folder) => {
+            
+            
+            this.folders = JSON.parse(folder);
+            console.log(this.folders);
+        });
+    }
+
+    onBackClick(){
+        
+        console.log('parent id'+ this.parentid)
+        if(this.parentid!=0){
+        this.onFolderClick(this.parentid);
+        }
+    }
 };

@@ -57,22 +57,24 @@
             </form>
         </div>
         <button class="btn btn-primary" (click)="onClickUpload()"
-           [disabled]="this.fileName =='Select a file' && this.folderName == 'Select a folder'">submit</button>
+           [disabled]="this.fileName =='Select a file' && this.folderName == 'Select a folder'">upload</button>
         <a href="#" class="btn btn-secondary" (click)="onClickDownload()">
             download</a>
     </section>
-
+    <button class="btn btn-success btn-small" (click)="onBackClick()">Back</button>
     <div class="folder text-muted">
+        
         <div class="container" *ngFor='let folder of folders'>
-
-            <div class="row" (click)="onClickFolder(folder)">
+            
+            <div class="row">
                 <div class="card">
-                    <!-- <img src="assets/img/folderImage.png" alt=""> -->
+                    <img src="assets/img/folderImage.png" alt="">
                     <h4>{{folder.name}}</h4>
-                    <p class="card-text">{{folder.path}}</p>
-                    <button *ngIf="post.fileType==2" type="button" (click)="onDownload(post)">Download</button>
-                    <button class="btn btn-danger btn-small" (click)="onDeleteClick">Delete</button>
-                    <button class="btn btn-success btn-small"(click)="saveFile()">Download</button></div>
+                    <!-- <p class="card-text">{{folder.path}}</p> -->
+                    <!--<button *ngIf="folder.fileType==2" type="button" (click)="onDownload(post)">Download</button> -->
+                    <button class="btn btn-success btn-small" (click)="onFolderClick(folder.id)">Open</button>
+                    <button class="btn btn-danger btn-small" (click)="onDeleteClick(folder.id,folder.fileType)">Delete</button> 
+                    <button class="btn btn-success btn-small"(click)="downloadFile(folder.id)">Download</button></div>
                 </div>
             </div>
 
