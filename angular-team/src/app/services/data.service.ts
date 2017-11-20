@@ -22,6 +22,27 @@ export class DataService {
     getFilesUrl: "someAPI",
   }
 
+  testRequest(data: any) {
+    let body = new URLSearchParams();
+    console.log("data:" + data);
+    body.set('file_path', data);
+    body.set('path_id', 0);
+    var body = 'username=myusername?password=mypassword';
+    var headers = new Headers();
+    headers.append('Content-Type', 'application/x-www-form-urlencoded');
+
+    this.http
+      .post('127.0.0.1:3000/files/add',
+      body, {
+        headers: headers
+      })
+      .subscribe(data => {
+        console.log(data)
+      }, error => {
+        console.log(JSON.stringify(error.json()));
+      });
+  }
+
   // postFile(data: any) {
   //   console.log("post file data:" + data);
   //   const body = { file_path: data, path_id: 0 };
