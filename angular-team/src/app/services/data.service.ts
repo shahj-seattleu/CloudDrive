@@ -19,8 +19,7 @@ export class DataService {
     let body = `file_path=${data}&path_id=0`;
     var headers = new Headers();
     headers.append('Content-Type', 'application/x-www-form-urlencoded');
-
-    this.http.post('http://127.0.0.1:3000/files/add',body, {
+    this.http.post(this.url.postFileUrl,body, {
         headers: headers
       })
       .subscribe(data => {
@@ -30,6 +29,8 @@ export class DataService {
       });
   }
 
+  
+  
     public url: any = {
         postFileUrl: "http://127.0.0.1:3000/files/add",
         postFolderUrl: "http://127.0.0.1:3000/files/add",
@@ -39,18 +40,23 @@ export class DataService {
     }
     //Has folder data for upload to server
     postFolder(data) {
-        console.log("post folder data: " + data);
-
-        return this.http.post(this.url.postFolderUrl, data).map((res: any) => res.json());
-    }
+        let body = `file_path=${data}&path_id=0`;
+        var headers = new Headers();
+        headers.append('Content-Type', 'application/x-www-form-urlencoded');
+        this.http.post(this.url.postFolderUrl,body, {
+            headers: headers
+          })
+          .subscribe(data => {
+            console.log(data)
+          }, error => {
+            console.log(error);
+          });
+      }
      //Has folder id for delete from server
      deleteFolder(id) {
         let body = `path_id=${id}`;
         var headers = new Headers();
         headers.append('Content-Type', 'application/x-www-form-urlencoded');
-        console.log("in delete: " + body);
-        // console.log("Nitish post folder data path id: "+request.path_id);
-
         return this.http.post(this.url.deleteFileUrl, body, {
             headers: headers
           }).map((res: any) => res.json());
@@ -63,54 +69,33 @@ export class DataService {
             .map(res => res.json());
     }
 
-    // //get a file from server
-    // //needs to get file by id
-    // getFile(id: Number) {
-    //     const urlConst = `${this.url.getFileUrl}?path_id=${id}`;
-    //         return this.http.get(urlConst)
-    //             .map(res => res.json());
-    //     }
 
     //get files from server
-    //should map to /list
+    //should map to list
     getFiles() {
         const urlConst = `${this.url.getFilesUrl}?path_id=0`;
         return this.http.get(urlConst)
                 .map(res => res.json());
         }
 
-    // deleteFile(id: Number){
-    //     const urlConst = `${this.url.deleteFileUrl}/${id}`;
-    //     console.log(this.url.deleteFileUrl);
-    //     // const url = 'http://127.0.0.1:3000/files/delete/2';
-    //     console.log("url of file to be deleted: " + urlConst);
-    //     // console.log("ID of file to be deleted: " + newFile);
-
-    //     return this.http.delete(urlConst)
-    //     .map(res => res.json());
-    // }
-
     saveFile(id) {
-        console.log('Download cliked data service: ' + id);
+        console.log('Saving file: ' + id);
         let body = `path_id=${id}`;
         var headers = new Headers();
-        console.log("in download body : ", body);
         headers.append('Content-Type', 'application/x-www-form-urlencoded');
-        console.log('Download Link data service -->'+this.url.downloadFileUrl);
+        console.log('Download server link ', this.url.downloadFileUrl);
         this.http.post(this.url.downloadFileUrl, {
             headers:headers
         }).toPromise()
         .then(response => this.saveToFileSystem(response));
-        // return this.http.post(this.url.downloadFileUrl, id).map((res: any) => res.json());
     }
 
    saveToFileSystem(response){
-       console.log("SavetoFileSytems: Response-->"+response)
+       console.log("SavetoFileSytems: Response ", response)
         const contentDispositionHeader: string = response.headers.get('Content-Disposition');
         const parts: string[] = contentDispositionHeader.split(';');
         const filename = parts[1].split('=')[1];
         const blob = new Blob([response._body], {type: 'text/plain'});
-
         saveAs(blob, filename);
         console.log("file name: " + filename + " downloaded!");
 

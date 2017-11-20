@@ -58,8 +58,7 @@
         </div>
         <button class="btn btn-primary" (click)="onClickUpload()"
            [disabled]="this.fileName =='Select a file' && this.folderName == 'Select a folder'">upload</button>
-        <!-- <a href="#" class="btn btn-secondary" (click)="onClickDownload()">
-            download</a> -->
+       
     </section>
     <button class="btn btn-success btn-small"  (click)="onBackClick()">Back</button>
     <div class="folder text-muted">
@@ -71,10 +70,8 @@
                     <img src="assets/img/folderImage.png" alt="">
                     <h4>{{folder.name}}</h4>
         
-                    <!-- <p class="card-text">{{folder.path}}</p> -->
-                    <!--<button *ngIf="folder.fileType==2" type="button" (click)="onDownload(post)">Download</button> -->
                     <button class="btn btn-success btn-small"  [ngClass]="{'notShow':folder.fileType==2}"  (click)="onFolderClick(folder.id)">Open</button>
-                    <button class="btn btn-danger btn-small" (click)="onDeleteClick(folder.id,folder.fileType)">Delete</button> 
+                    <button class="btn btn-danger btn-small" (click)="onDeleteClick(folder.id)">Delete</button> 
                     <button class="btn btn-success btn-small"(click)="downloadFile(folder.id)">Download</button></div>
                 </div>
             </div>
