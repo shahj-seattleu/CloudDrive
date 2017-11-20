@@ -16,34 +16,20 @@ export class DataService {
   };
 
   postFile(data: any) {
-    let body = new URLSearchParams();
-    console.log("data:" + data);
-    body.set('file_path', data);
-    body.set('path_id', 0);
-    var body = 'username=myusername?password=mypassword';
+    let body = `file_path=${data}&path_id=0`;
     var headers = new Headers();
     headers.append('Content-Type', 'application/x-www-form-urlencoded');
 
-    this.http
-      .post('127.0.0.1:3000/files/add',
-      body, {
+    this.http.post('http://127.0.0.1:3000/files/add',body, {
         headers: headers
       })
       .subscribe(data => {
         console.log(data)
       }, error => {
-        console.log(JSON.stringify(error.json()));
+        console.log(error);
       });
   }
 
-  // postFile(data: any) {
-  //   console.log("post file data:" + data);
-  //   const body = { file_path: data, path_id: 0 };
-  //   this.http.post('127.0.0.1:3000/files/add', body, {
-  //     headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
-  //   }).subscribe(data => console.log(data));
-  //
-  // }
 
     public url: any = {
         postFileUrl: "http://127.0.0.1:3000/files/add",
@@ -51,14 +37,6 @@ export class DataService {
         downloadFileUrl: "http://127.0.0.1:3000/files/download",
         getFilesUrl: "http://127.0.0.1:3000/files/list",
         deleteFileUrl: "http://127.0.0.1:3000/files/delete"
-    }
-    //Has file data for upload to server
-    postFile2(data) {
-        console.log("post file data:" + data);
-
-        console.log(data);
-        return this.http.post(this.url.postFileUrl, data).map((res: any) => res.json());
-
     }
     //Has folder data for upload to server
     postFolder(data) {

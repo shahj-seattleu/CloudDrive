@@ -51,11 +51,11 @@ export class HomeComponent implements OnInit {
 
 
     removeFileData(id) {
-        
+
                 this.newFile.path_id=id;
-        
+
     }
-    
+
     retrieveFileData(event) {
         if (event.target.files[0]) {
             this.fileName = event.target.files[0].name;
@@ -65,7 +65,7 @@ export class HomeComponent implements OnInit {
             reader.onload = (loadEvent: any = {}) => {
                 // this.newFile.path = this.filePath;
                 this.newFile.path_id=0;
-                this.newFile.file_path = "C:/Users/Nitish/Desktop/Allfolders/testforclouddrive.docx";
+                this.newFile.file_path = "/Users/kanav/Downloads/mean-concept.png";
                 // this.newFile.name = this.fileName;
                 // this.newFile.fileType = 0;
                 // this.newFile.size = this.fileSize;
@@ -95,7 +95,7 @@ export class HomeComponent implements OnInit {
     ngOnInit() {
         console.log('ngOnInit ran successfuly ...');
         this.dataservice.getFiles().subscribe((folder) => {
-            
+
 
             this.folders = JSON.parse(folder);
             console.log(this.folders);
@@ -142,29 +142,31 @@ export class HomeComponent implements OnInit {
             return obj;
         }
 
-        let payload1 = JSON.stringify(removeEmpty(this.newFile));
-        let payload2 = JSON.stringify(removeEmpty(this.folder));
+        // let payload1 = JSON.stringify(removeEmpty(this.newFile));
+        // let payload2 = JSON.stringify(removeEmpty(this.folder));
 
-        console.log("this is payload:" + payload1 + payload2);
+        // console.log("this is payload:" + payload1 + payload2);
+        console.log('File:',this.newFile.file_path);
+        this.dataservice.postFile(this.newFile.file_path);
 
-        this.dataservice.postFile(payload1)
-            .subscribe(
-                (res: any) => {
-                    console.log("file upload successful:", res);
-                },
-                (error: any) => {
-                    console.log("thrown error", error);
-                }
-            );
-        this.dataservice.postFolder(payload2)
-            .subscribe(
-                (res: any) => {
-                    console.log("folder upload successful:", res);
-                },
-                (error: any) => {
-                    console.log("thrown error", error);
-                }
-            )
+        // this.dataservice.postFile(payload1)
+        //     .subscribe(
+        //         (res: any) => {
+        //             console.log("file upload successful:", res);
+        //         },
+        //         (error: any) => {
+        //             console.log("thrown error", error);
+        //         }
+        //     );
+        // this.dataservice.postFolder(this.newFile)
+        //     .subscribe(
+        //         (res: any) => {
+        //             console.log("folder upload successful:", res);
+        //         },
+        //         (error: any) => {
+        //             console.log("thrown error", error);
+        //         }
+        //     )
     };
 //Should get id and make a JSON with only path_id to let service delete file sonly with that id
     onDeleteClick(id,filetype):void{
@@ -189,7 +191,7 @@ export class HomeComponent implements OnInit {
 
     const request ={path_id: id};
     // let request = JSON.stringify(removeEmpty(payLoad)) ;
-    
+
     console.log("this is payload:" , request);
 
     this.dataservice.deleteFolder(request)
@@ -211,10 +213,10 @@ export class HomeComponent implements OnInit {
             }
         )
 };
-            
-        
+
+
         // console.log("delete button clicked");
-        
+
         // console.log("deleting " + newFile);
         // this.dataservice.deleteFile(newFile).subscribe(res => {
         //     console.log(res);
@@ -223,7 +225,7 @@ export class HomeComponent implements OnInit {
         //             this.folders.splice(i,1);
         //         }
         //     }
-            
+
         // });
     // }
 
@@ -231,7 +233,7 @@ export class HomeComponent implements OnInit {
     downloadFile(id){
         console.log("downloading ..." + id);
         this.dataservice.saveFile(id);
-        
+
     }
 
 
@@ -244,7 +246,7 @@ export class HomeComponent implements OnInit {
 //               (error: any) => {
 //                   console.log("thrown error", error);
 //               }
-              
+
 //           );
 //       let res2 = this.dataservice.saveFile(payload2)
 //           .subscribe(
@@ -257,23 +259,23 @@ export class HomeComponent implements OnInit {
 //           )
 //           this.dataservice.saveToFileSystem(res);
 //   };
-            
-    
+
+
 
     onFolderClick(id){
         console.log("opening ..." + id);
         this.parentid = id-1;
         // this.dataservice.getFolder(id);
         this.dataservice.getFolder(id).subscribe((folder) => {
-            
-            
+
+
             this.folders = JSON.parse(folder);
             console.log(this.folders);
         });
     }
 
     onBackClick(){
-        
+
         console.log('parent id'+ this.parentid)
         if(this.parentid!=0){
         this.onFolderClick(this.parentid);
