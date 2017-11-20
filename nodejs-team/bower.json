@@ -1,0 +1,25 @@
+{
+  "name": "bootstrap",
+  "description": "CSS and Javascript",
+  "main": "",
+  "authors": [
+    "kanav.gupta <kanavkartik@gmail.com>"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "responsive",
+    "layout"
+  ],
+  "homepage": "https://github.com/shahj-seattleu/CloudDrive",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "3.3.7"
+  }
+}
