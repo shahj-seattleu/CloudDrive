@@ -59,9 +59,11 @@ export class HomeComponent implements OnInit {
     retrieveFileData(event) {
         if (event.target.files[0]) {
             this.fileName = event.target.files[0].name;
+
             this.fileSize = event.target.files[0].size;
             // this.filePath = event.target.files[0].mozFullPath;
             this.filePath = URL.createObjectURL(event.target.files[0]);
+            console.log('fileName',this.filePath);
             var reader = new FileReader();
             reader.onload = (loadEvent: any = {}) => {
                 // this.newFile.path = this.filePath;

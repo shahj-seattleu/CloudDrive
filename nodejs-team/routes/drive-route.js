@@ -14,6 +14,9 @@ var sha = require("../sha/sha");
 router.get('/list', function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-  With, Content-Type, Accept");
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+
   var key = 0;
   if (req.query.path_id) {
     key = req.query.path_id;
@@ -44,6 +47,11 @@ router.get('/list', function(req, res, next) {
 
 
 router.get('/sha', function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-  With, Content-Type, Accept");
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+
   var key = 0;
   if (req.body.path_id != undefined) {
     key = req.body.path_id;
@@ -73,6 +81,8 @@ router.get('/sha', function(req, res, next) {
 router.post('/delete', function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-  With, Content-Type, Accept");
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
 
   console.log('here');
   var key = 0;
@@ -113,6 +123,7 @@ router.post('/download', function(req, res, next) {
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
 
+
   var key = 0;
   if (req.body.path_id != undefined) {
     key = req.body.path_id;
@@ -135,6 +146,11 @@ router.post('/download', function(req, res, next) {
 
 router.post('/move', function(req, res, next) {
   console.log("router move");
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-  With, Content-Type, Accept");
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+
   var filePath = '';
   if (req.body.file_path != undefined) {
     filePath = req.body.file_path;
@@ -148,7 +164,7 @@ router.post('/move', function(req, res, next) {
   if (result) {
     var p = drive_sequelize.move(path_id, filePath);
     p.then(fileId => {
-        res.json(JSON.stringify(p));
+        res.json(JSON.stringify(fileId));
       })
       .catch(err => {
         res.status(404).send({
