@@ -65,7 +65,7 @@ export class HomeComponent implements OnInit {
             reader.onload = (loadEvent: any = {}) => {
                 // this.newFile.path = this.filePath;
                 this.newFile.path_id=0;
-                this.newFile.file_path = "/Users/kanav/Downloads/mean-concept.png";
+                this.newFile.file_path = "C:/Users/Nitish/Desktop/Allfolders/testforclouddrive.docx";
                 // this.newFile.name = this.fileName;
                 // this.newFile.fileType = 0;
                 // this.newFile.size = this.fileSize;
