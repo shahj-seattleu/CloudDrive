@@ -157,12 +157,18 @@ exports.multiple = function(id, isFile) {
           var val = drive[key];
           var path = val.path;
           p = delete_file(val.id);
-          console.log('Remove file from drive'+path);
-          removefiles(path);
-          console.log('sdddd' + p);
+          x.then(pdrive => {
+            console.log('Remove file from drive'+path);
+            removefiles(path);
+            console.log('sdddd' + p);
+          }).catch(err => {
+            reject(err);
+          });
         }).catch(err => {
           reject(err);
         });
+      } else {
+        reject('File Not Found');
       }
       });
     }).catch(err => {
@@ -188,8 +194,10 @@ var delete_file = function(id) {
       else {
         reject(`Unable to find a matching Drive model`);
       }
-      return affectedRows;
+      //return affectedRows;
     });
+  }).catch(err => {
+    reject(err);
   });
 };
 
