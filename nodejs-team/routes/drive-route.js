@@ -148,7 +148,7 @@ router.post('/move', function(req, res, next) {
   if (result) {
     var p = drive_sequelize.move(path_id, filePath);
     p.then(fileId => {
-        res.json(JSON.stringify(p));
+        res.json(JSON.stringify(fileId));
       })
       .catch(err => {
         res.status(404).send({

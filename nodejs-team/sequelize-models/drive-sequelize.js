@@ -367,7 +367,7 @@ exports.move = function(sourceId, destPath) {
               });
             } else {
               // File has been successfully moved, so we're done!
-              resolve(msg);
+              resolve("Move completed successfully");
             }
           } else {
             msg = `Failed to move id:${sourceId} to new parent:${destParentId}`;
