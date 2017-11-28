@@ -6,6 +6,7 @@ const util = require('util');
 var del = require('node-delete');
 const log = require('debug')('nodejs-team:drive-sequelize');
 const error = require('debug')('nodejs-team:error');
+const fsx = require("fs-extra");
 
 var models = require('../models/index');
 var Drive = require('../models/drive');
@@ -232,7 +233,7 @@ exports.update_SHA = function(id, sha) {
 };
 
 
-exports.move = function(sourceId, destPath) {
+exports.move = function (sourceId, destPath) {
   console.log(`sourceId:${sourceId}  destPath:${destPath}`)
 
   return new Promise((resolve, reject) => {
@@ -257,7 +258,7 @@ exports.move = function(sourceId, destPath) {
     }
 
     // Find the name of the source file/folder that we're moving
-    models.Drive.findById(sourceId).then(function(sourceRow) {
+    models.Drive.findById(sourceId).then(function (sourceRow) {
       if (sourceRow) {
         destFileName = sourceRow.name;
         sourceFileType = sourceRow.fileType;
@@ -278,7 +279,7 @@ exports.move = function(sourceId, destPath) {
         where: {
           path: destSearchPath
         }
-      }).then(function(destRow) {
+      }).then(function (destRow) {
         if (destRow) {
           // Found the path specified, use it's ID as the new parentId
           destParentId = destRow.id;
@@ -329,60 +330,75 @@ exports.move = function(sourceId, destPath) {
           parent_id: destParentId,
           path: destFullPath
         }, {
-          where: {
-            id: sourceId
-          }
-        }).then(function(moved) {
-          if (moved != 0) {
-            msg = `Moved id:${sourceId} to new parent:${destParentId}`;
-            console.log(msg);
-
-            // If we're moving a folder, then we need to update the paths for each of
-            // it's children as well to reflect the new location.
-            if (sourceFileType == 1) {
-
-              // When querying for a string with backslashes, they need to be doubled up,
-              // even if they already look doubled up in anything output to the console.
-              // For example, if we search for C:\\SOME\\PATH then we need to actually look
-              // for C:\\\\SOME\\\\PATH in order for the search to be successful.
-              var pattern = /\\/g;
-              var sqlSearchPath = sourceRootPath.replace(pattern, "\\\\");
-              console.log(`sqlSearchPath: '${sqlSearchPath}'`);
-
-              // Find all records that match the path we're looking for
-              const Op = sequelize.Op;
-              models.Drive.findAll({
-                where: {
-                  path: {
-                    [Op.like]: sqlSearchPath + '%'
-                  }
-                }
-              }).then(function(results) {
-                // Loop through each record and update the path
-                var promises = [];
-                Object.keys(results).forEach(function(key) {
-                  var val = results[key];
-                  var updatedPath = val.path.replace(sourceRootPath, destFullPath);
-                  console.log(`UPDATED PATH: '${updatedPath}'`);
-                  val.updateAttributes({path: updatedPath});
-                });
-
-                resolve("Move completed successfully");
-
-              }).catch(err => {
-                console.log("Error caught: " + err);
-                reject(err);
-              });
-            } else {
-              // File has been successfully moved, so we're done!
-              resolve("Move completed successfully");
+            where: {
+              id: sourceId
             }
-          } else {
-            msg = `Failed to move id:${sourceId} to new parent:${destParentId}`;
-            console.log(msg);
-            reject(msg);
-          }
-        });
+          }).then(function (moved) {
+            if (moved != 0) {
+              msg = `Moved id:${sourceId} to new parent:${destParentId}`;
+              console.log(msg);
+
+              // If we're moving a folder, then we need to update the paths for each of
+              // it's children as well to reflect the new location.
+              if (sourceFileType == 1) {
+
+                // When querying for a string with backslashes, they need to be doubled up,
+                // even if they already look doubled up in anything output to the console.
+                // For example, if we search for C:\\SOME\\PATH then we need to actually look
+                // for C:\\\\SOME\\\\PATH in order for the search to be successful.
+                var pattern = /\\/g;
+                var sqlSearchPath = sourceRootPath.replace(pattern, "\\\\");
+                console.log(`sqlSearchPath: '${sqlSearchPath}'`);
+
+                // Find all records that match the path we're looking for
+                const Op = sequelize.Op;
+                models.Drive.findAll({
+                  where: {
+                    path: {
+                      [Op.like]: sqlSearchPath + '%'
+                    }
+                  }
+                }).then(function (results) {
+                  // Loop through each record and update the path
+                  var promises = [];
+                  Object.keys(results).forEach(function (key) {
+                    var val = results[key];
+                    var updatedPath = val.path.replace(sourceRootPath, destFullPath);
+                    console.log(`UPDATED PATH: '${updatedPath}'`);
+                    val.updateAttributes({ path: updatedPath });
+                  });
+
+                  // Now move the actual folder on the server
+                  fsx.move(sourceRootPath, destFullPath, function (err) {
+                    if (err) {
+                      console.log(err);
+                      reject(err);
+                    } else {
+                      resolve("Move completed successfully");
+                    }
+                  });
+                }).catch(err => {
+                  console.log("Error caught: " + err);
+                  reject(err);
+                });
+              } else {
+                // Now move the actual file on the server
+                fsx.move(sourceRootPath, destFullPath, function (err) {
+                  if (err) {
+                    console.log(err);
+                    reject(err);
+                  } else {
+                    // File has been successfully moved, so we're done!
+                    resolve(msg);
+                  }
+                });
+              }
+            } else {
+              msg = `Failed to move id:${sourceId} to new parent:${destParentId}`;
+              console.log(msg);
+              reject(msg);
+            }
+          });
       });
     });
   });
