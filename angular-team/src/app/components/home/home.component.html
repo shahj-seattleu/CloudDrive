@@ -36,7 +36,7 @@
             <h1 class="jumbotron-heading">Welcome! </h1>
             <p class="lead text-muted">Here are your folders.</p>
 
-            <form #uploaderForm="ngForm">
+            <form #uploaderForm="ngForm" method="post" enctype="multipart/form-data">
 
                 <div class="uploadFile">
                     <label for="file">
